@@ -30,13 +30,15 @@ KeyTable {
  */
 
 static QMap<int,QString> createTypes() {
-    QMap<int,QString> types;
-    types[QVariant::String] = "QString";
-    types[QVariant::Int] = "int";
-    types[QVariant::Double] = "qreal";
-    types[QVariant::Bool] = "bool";
-    types[QVariant::PointF] = "QPointF";
-    types[QVariant::RectF] = "QRectF";
+    static QMap<int,QString> types
+    {
+        {QVariant::String, QLatin1String{"QString"}},
+        {QVariant::Int, QLatin1String{"int"}},
+        {QVariant::Double, QLatin1String{"qreal"}},
+        {QVariant::Bool, QLatin1String{"bool"}},
+        {QVariant::PointF, QLatin1String{"QPointF"}},
+        {QVariant::RectF, QLatin1String{"QRectF"}},
+    };
 
     return types;
 }
@@ -51,26 +53,26 @@ QString QFKeyTable::genHeaderFile(const QString& className)
 
     QStringList header;
     QStringList clazz;
-    bool includedPointHeader = false;
-    bool includedRectHeader = false;
+    auto includedPointHeader = false;
+    auto includedRectHeader = false;
 
-    header << "#pragma once";
-    header << "#include <QString>\n";
+    header << QLatin1String{"#pragma once"};
+    header << QLatin1String{"#include <QString>\n"};
 
     clazz << QString("class %1 {\n").arg(className);
-    clazz << "public:\n";
+    clazz << QLatin1String{"public:\n"};
 
-    const QMetaObject* meta = metaObject();
+    const auto meta = metaObject();
 
-    QMap<int,QString> types = createTypes();
+    auto types = createTypes();
 
     int count = meta->propertyCount();
     for (int i = 0 ; i < count ; i++) {
-        const QMetaProperty p = meta->property(i);
+        const auto p = meta->property(i);
 
         QString name(p.name());
 
-        if (name == "objectName") {
+        if (name == QLatin1String{"objectName"}) {
             continue;
         }
 
@@ -79,16 +81,16 @@ QString QFKeyTable::genHeaderFile(const QString& className)
 
             if (p.type() == QVariant::PointF && !includedPointHeader) {
                 includedPointHeader = true;
-                header << "#include <QPointF>";
+                header << QLatin1String{"#include <QPointF>"};
             } else if (p.type() == QVariant::RectF && !includedRectHeader) {
                 includedRectHeader = true;
-                header << "#include <QRectF>";
+                header << QLatin1String{"#include <QRectF>"};
             }
         }
 
     }
 
-    clazz << "};\n";
+    clazz << QLatin1String{"};\n"};
 
     QStringList content;
     content << header << clazz;
@@ -98,19 +100,19 @@ QString QFKeyTable::genHeaderFile(const QString& className)
 
 QString QFKeyTable::genSourceFile(const QString &className, const QString &headerFile)
 {
-    QMap<int,QString> types = createTypes();
+    auto types = createTypes();
 
     QStringList source;
 
     source << QString("#include \"%1\"\n").arg(headerFile);
 
-    const QMetaObject* meta = metaObject();
+    const auto meta = metaObject();
 
     int count = meta->propertyCount();
     for (int i = 0 ; i < count ; i++) {
-        const QMetaProperty p = meta->property(i);
+        const auto p = meta->property(i);
         QString name(p.name());
-        if (name == "objectName") {
+        if (name == QLatin1String{"objectName"}) {
             continue;
         }
 
@@ -166,18 +168,18 @@ void QFKeyTable::classBegin()
 
 void QFKeyTable::componentComplete()
 {
-    const QMetaObject* meta = metaObject();
+    const auto meta = metaObject();
 
     int count = meta->propertyCount();
     for (int i = 0 ; i < count ; i++) {
-        const QMetaProperty p = meta->property(i);
+        const auto p = meta->property(i);
         QString name(p.name());
         if (p.type() != QVariant::String ||
-            name == "objectName") {
+            name == QLatin1String{"objectName"}) {
             continue;
         }
 
-        QVariant v = property(p.name());
+        auto v = property(p.name());
         if (!v.isNull()) {
             continue;
         }

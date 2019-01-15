@@ -91,16 +91,16 @@ Middleware {
 
 The default value is false
  */
-void QFMiddleware::next(QString type, QJSValue message)
+void QFMiddleware::next(const QString &type, const QJSValue &message)
 {
-    QQmlEngine* engine = qmlEngine(this);
+    auto engine = qmlEngine(this);
     QF_PRECHECK_DISPATCH(engine, type, message);
 
     if (m_nextCallback.isCallable()) {
         QJSValueList args;
         args << type;
         args << message;
-        QJSValue result = m_nextCallback.call(args);
+        auto result = m_nextCallback.call(args);
         if (result.isError()) {
             QuickFlux::printException(result);
         }

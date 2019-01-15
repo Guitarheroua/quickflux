@@ -100,15 +100,11 @@ Connections {
 
  */
 
-QFDispatcher::QFDispatcher(QObject *parent) : QObject(parent)
+QFDispatcher::QFDispatcher(QObject *parent)
+    : QObject(parent)
+      , m_dispatching{false}
+      , nextListenerId{1}
 {
-    m_dispatching = false;
-    nextListenerId = 1;
-}
-
-QFDispatcher::~QFDispatcher()
-{
-
 }
 
 /*!
@@ -140,11 +136,11 @@ Store {
 
  */
 
-void QFDispatcher::dispatch(QString type, QJSValue message)
+void QFDispatcher::dispatch(const QString &type, const QJSValue &message)
 {
     QF_PRECHECK_DISPATCH(m_engine.data(), type, message);
 
-    auto process = [=](QString type, QJSValue message) {
+    auto process = [=](const auto &type, const auto &message) {
         if (m_hook.isNull()) {
             send(type, message);
         } else {
@@ -161,7 +157,7 @@ void QFDispatcher::dispatch(QString type, QJSValue message)
     process(type,message);
 
     while (m_queue.size() > 0) {
-        QPair<QString,QJSValue> pair = m_queue.dequeue();
+        auto pair = m_queue.dequeue();
         process(pair.first,pair.second);
     }
     m_dispatching = false;
@@ -197,9 +193,9 @@ void QFDispatcher::waitFor(QList<int> ids)
 
  */
 
-int QFDispatcher::addListener(QJSValue callback)
+int QFDispatcher::addListener(const QJSValue &callback)
 {
-    QFListener* listener = new QFListener(this);
+    auto listener = new QFListener(this);
     listener->setCallback(callback);
 
     return addListener(listener);
@@ -227,7 +223,7 @@ int QFDispatcher::addListener(QFListener *listener)
 void QFDispatcher::removeListener(int id)
 {
     if (m_listeners.contains(id)) {
-        QFListener* listener = m_listeners[id].data();
+        auto listener = m_listeners[id].data();
         if (listener->parent() == this) {
             listener->deleteLater();
         }
@@ -251,13 +247,13 @@ void QFDispatcher::dispatch(const QString &type, const QVariant &message)
         return;
     }
 
-    QJSValue value = m_engine->toScriptValue<QVariant>(message);
+    auto value = m_engine->toScriptValue<QVariant>(message);
 
     dispatch(type, value);
 }
 
 
-void QFDispatcher::send(QString type, QJSValue message)
+void QFDispatcher::send(const QString &type, const QJSValue &message)
 {
     dispatchingMessage = message;
     dispatchingMessageType = type;
@@ -277,13 +273,11 @@ void QFDispatcher::send(QString type, QJSValue message)
     emit dispatched(type,message);
 }
 
-void QFDispatcher::invokeListeners(QList<int> ids)
+void QFDispatcher::invokeListeners(const QList<int> &ids)
 {
-    for (int i = 0 ; i < ids.size() ; i++) {
-        int next = ids.at(i);
-
+    for (const auto &next : ids) {
         if (waitingListeners.contains(next)) {
-            qWarning() << "AppDispatcher: Cyclic dependency detected";
+            qWarning() << QLatin1String{"AppDispatcher: Cyclic dependency detected"};
         }
 
         if (!pendingListeners.contains(next))
@@ -292,7 +286,7 @@ void QFDispatcher::invokeListeners(QList<int> ids)
         pendingListeners.remove(next);
         dispatchingListenerId = next;
 
-        QFListener* listener = m_listeners[next].data();
+        auto listener = m_listeners[next].data();
 
         if (listener) {
             listener->dispatch(this,dispatchingMessageType,dispatchingMessage);
@@ -321,9 +315,9 @@ void QFDispatcher::setHook(QFHook *hook)
 }
 
 /*! \fn QQmlEngine *QFAppDispatcher::engine() const
-  
+
   Obtain the associated engine to this dispatcher.
-  
+
  */
 
 QQmlEngine *QFDispatcher::engine() const

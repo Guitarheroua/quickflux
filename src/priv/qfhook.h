@@ -6,11 +6,10 @@ class QFHook : public QObject
 {
     Q_OBJECT
 public:
-    explicit QFHook(QObject *parent = 0);
+    explicit QFHook(QObject *parent = nullptr);
 
-    virtual void dispatch(QString type, QJSValue message) = 0;
+    virtual void dispatch(const QString &type, const QJSValue &message) = 0;
 
 signals:
-    void dispatched(QString type, QJSValue message);
-
+    void dispatched(const QString &type, const QJSValue &message);
 };

@@ -4,12 +4,13 @@
 #include "priv/qfappscriptrunnable.h"
 #include "priv/qfappscriptdispatcherwrapper.h"
 
-QFAppScriptRunnable::QFAppScriptRunnable(QObject *parent) : QObject(parent)
+QFAppScriptRunnable::QFAppScriptRunnable(QObject *parent)
+    : QObject(parent)
+      , m_next{}
+      , m_engine{}
+      , m_isSignalCondition{false}
+      , m_isOnceOnly{true}
 {
-    m_engine = 0;
-    m_next = 0;
-    m_isSignalCondition = false;
-    m_isOnceOnly = true;
 }
 
 QFAppScriptRunnable::~QFAppScriptRunnable()
@@ -56,9 +57,9 @@ void QFAppScriptRunnable::release()
 {
     if (!m_condition.isNull() &&
             m_condition.isObject() &&
-        m_condition.hasProperty("disconnect")) {
+        m_condition.hasProperty(QLatin1String{"disconnect"})) {
 
-        QJSValue disconnect = m_condition.property("disconnect");
+        auto disconnect = m_condition.property(QLatin1String{"disconnect"});
         QJSValueList args;
         args << m_callback;
 
@@ -69,12 +70,12 @@ void QFAppScriptRunnable::release()
     m_callback = QJSValue();
 }
 
-void QFAppScriptRunnable::run(QJSValue message)
+void QFAppScriptRunnable::run(const QJSValue &message)
 {
     QJSValueList args;
     if (m_isSignalCondition &&
-        message.hasProperty("length")) {
-        int count = message.property("length").toInt();
+        message.hasProperty(QLatin1String{"length"})) {
+        int count = message.property(QLatin1String{"length"}).toInt();
         for (int i = 0 ; i < count;i++) {
             args << message.property(i);
         }
@@ -85,18 +86,18 @@ void QFAppScriptRunnable::run(QJSValue message)
 
     if (ret.isError()) {
         QString message = QString("%1:%2: %3: %4")
-                          .arg(ret.property("fileName").toString())
-                          .arg(ret.property("lineNumber").toString())
-                          .arg(ret.property("name").toString())
-                          .arg(ret.property("message").toString());
+                          .arg(ret.property(QLatin1String{"fileName"}).toString())
+                          .arg(ret.property(QLatin1String{"lineNumber"}).toString())
+                          .arg(ret.property(QLatin1String{"name"}).toString())
+                              .arg(ret.property(QLatin1String{"message"}).toString());
         qWarning() << message;
     }
 
 }
 
-QFAppScriptRunnable *QFAppScriptRunnable::then(QJSValue condition,QJSValue script)
+QFAppScriptRunnable *QFAppScriptRunnable::then(const QJSValue &condition, const QJSValue &script)
 {
-    QFAppScriptRunnable* runnable = new QFAppScriptRunnable(this);
+    auto runnable = new QFAppScriptRunnable(this);
     runnable->setEngine(m_engine.data());
     runnable->setCondition(condition);
     runnable->setScript(script);
@@ -114,7 +115,7 @@ void QFAppScriptRunnable::setNext(QFAppScriptRunnable *next)
     m_next = next;
 }
 
-void QFAppScriptRunnable::setCondition(QJSValue condition)
+void QFAppScriptRunnable::setCondition(const QJSValue &condition)
 {
     m_condition = condition;
 
@@ -124,31 +125,31 @@ void QFAppScriptRunnable::setCondition(QJSValue condition)
     } else if (condition.isObject() && condition.hasProperty("connect")) {
         Q_ASSERT(!m_engine.isNull());
 
-        QString type = QString("QuickFlux.AppScript.%1").arg(QUuid::createUuid().toString());
+        auto type = QString("QuickFlux.AppScript.%1").arg(QUuid::createUuid().toString());
         setType(type);
 
-        QString generator = "function(dispatcher) { return function() {dispatcher.dispatch(arguments)}}";
-        QFAppDispatcher* dispatcher = QFAppDispatcher::instance(m_engine);
-        QFAppScriptDispatcherWrapper * wrapper = new QFAppScriptDispatcherWrapper();
+        auto generator = "function(dispatcher) { return function() {dispatcher.dispatch(arguments)}}";
+        auto dispatcher = QFAppDispatcher::instance(m_engine);
+        auto wrapper = new QFAppScriptDispatcherWrapper();
         wrapper->setType(type);
         wrapper->setDispatcher(dispatcher);
 
-        QJSValue generatorFunc = m_engine->evaluate(generator);
+        auto generatorFunc = m_engine->evaluate(generator);
 
         QJSValueList args;
         args << m_engine->newQObject(wrapper);
-        QJSValue callback = generatorFunc.call(args);
+        auto callback = generatorFunc.call(args);
 
         args.clear();
         args << callback;
 
-        QJSValue connect = condition.property("connect");
+        auto connect = condition.property(QLatin1String{"connect"});
         connect.callWithInstance(condition,args);
 
         m_callback = callback;
         m_isSignalCondition = true;
     } else {
-        qWarning() << "AppScript: Invalid condition type";
+        qWarning() << QLatin1String{"AppScript: Invalid condition type"};
     }
 }
 

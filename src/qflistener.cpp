@@ -2,12 +2,9 @@
 #include "qfdispatcher.h"
 #include "priv/qflistener.h"
 
-QFListener::QFListener(QObject *parent) : QObject(parent)
-{
-    m_listenerId = 0;
-}
-
-QFListener::~QFListener()
+QFListener::QFListener(QObject *parent)
+    : QObject(parent)
+      , m_listenerId{0}
 {
 }
 
@@ -21,7 +18,7 @@ void QFListener::setCallback(const QJSValue &callback)
     m_callback = callback;
 }
 
-void QFListener::dispatch(QFDispatcher *dispatcher,QString type, QJSValue message)
+void QFListener::dispatch(QFDispatcher *dispatcher, const QString &type, const QJSValue &message)
 {
 
     if (m_waitFor.size() > 0) {
@@ -31,14 +28,14 @@ void QFListener::dispatch(QFDispatcher *dispatcher,QString type, QJSValue messag
     if (m_callback.isCallable()) {
         QJSValueList args;
         args << type << message;
-        QJSValue ret = m_callback.call(args);
+        auto ret = m_callback.call(args);
 
         if (ret.isError()) {
-            QString message = QString("%1:%2: %3: %4")
-                              .arg(ret.property("fileName").toString())
-                              .arg(ret.property("lineNumber").toString())
-                              .arg(ret.property("name").toString())
-                              .arg(ret.property("message").toString());
+            auto message = QString("%1:%2: %3: %4")
+                           .arg(ret.property(QLatin1String{"fileName"}).toString())
+                           .arg(ret.property(QLatin1String{"lineNumber"}).toString())
+                           .arg(ret.property(QLatin1String{"name"}).toString())
+                           .arg(ret.property(QLatin1String{"message"}).toString());
             qWarning() << message;
         }
     }

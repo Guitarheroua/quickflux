@@ -12,14 +12,14 @@ class QFListener : public QObject
 {
     Q_OBJECT
 public:
-    explicit QFListener(QObject *parent = 0);
-    ~QFListener();
+    explicit QFListener(QObject *parent = nullptr);
+    ~QFListener() = default;
 
     QJSValue callback() const;
 
     void setCallback(const QJSValue &callback);
 
-    void dispatch(QFDispatcher* dispatcher, QString type, QJSValue message);
+    void dispatch(QFDispatcher* dispatcher, const QString &type, const QJSValue &message);
 
     int listenerId() const;
 
@@ -30,7 +30,7 @@ public:
     void setWaitFor(const QList<int> &waitFor);
 
 signals:
-    void dispatched(QString type, QJSValue message);
+    void dispatched(const QString &type, const QJSValue &message);
 
 public slots:
 

@@ -11,7 +11,7 @@
 class QFSignalProxy : public QObject
 {
 public:
-    explicit QFSignalProxy(QObject *parent = 0);
+    explicit QFSignalProxy(QObject *parent = nullptr);
 
     void bind(QObject* source, int signalIdx, QQmlEngine* engine, QFDispatcher* dispatcher);
 

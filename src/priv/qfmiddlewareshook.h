@@ -15,12 +15,12 @@ public:
 signals:
 
 public:
-    void dispatch(QString type, QJSValue message);
+    void dispatch(const QString &type, const QJSValue &message) override;
     void setup(QQmlEngine* engine, QObject* middlewares);
 
 public slots:
-    void next(int senderId, QString type, QJSValue message);
-    void resolve(QString type, QJSValue message);
+    void next(int senderId, const QString &type, const QJSValue &message);
+    void resolve(const QString &type, const QJSValue &message);
 
 
 private:

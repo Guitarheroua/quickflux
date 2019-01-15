@@ -39,32 +39,32 @@ Item {
 
  */
 
-QFActionCreator::QFActionCreator(QObject *parent) : QObject(parent)
+QFActionCreator::QFActionCreator(QObject *parent)
+    : QObject(parent)
 {
-
 }
 
 QString QFActionCreator::genKeyTable()
 {
     QStringList imports, header, footer, properties;
 
-    imports << "pragma Singleton"
-            << "import QtQuick 2.0"
-            << "import QuickFlux 1.0\n";
+    imports << QLatin1String{"pragma Singleton"}
+            << QLatin1String{"import QtQuick 2.0"}
+            << QLatin1String{"import QuickFlux 1.0\n"};
 
-    header << "KeyTable {\n";
+    header << QLatin1String{"KeyTable {\n"};
 
-    footer <<  "}";
+    footer <<  QLatin1String{"}"};
 
-    const int memberOffset = QObject::staticMetaObject.methodCount();
+    const auto memberOffset = QObject::staticMetaObject.methodCount();
 
-    const QMetaObject* meta = metaObject();
+    const auto meta = metaObject();
 
-    int count = meta->methodCount();
+    auto count = meta->methodCount();
 
-    for (int i = memberOffset ; i < count ;i++) {
-        QMetaMethod method = meta->method(i);
-        if (method.name() == "dispatcherChanged") {
+    for (auto i = memberOffset ; i < count ;i++) {
+        auto method = meta->method(i);
+        if (method.name() == QByteArray{"dispatcherChanged"}) {
             continue;
         }
         if (method.methodType() == QMetaMethod::Signal) {
@@ -78,7 +78,7 @@ QString QFActionCreator::genKeyTable()
     return content.join("\n");
 }
 
-void QFActionCreator::dispatch(QString type, QJSValue message)
+void QFActionCreator::dispatch(const QString &type, const QJSValue &message)
 {
     if (!m_dispatcher.isNull()) {
         m_dispatcher->dispatch(type, message);
@@ -92,28 +92,28 @@ void QFActionCreator::classBegin()
 
 void QFActionCreator::componentComplete()
 {
-    QQmlEngine* engine = qmlEngine(this);
+    auto engine = qmlEngine(this);
 
     if (m_dispatcher.isNull()) {
         setDispatcher(qobject_cast<QFDispatcher*>(QFAppDispatcher::instance(engine)));
     }
 
-    QFDispatcher* dispatcher = m_dispatcher.data();
+    auto dispatcher = m_dispatcher.data();
 
-    const int memberOffset = QObject::staticMetaObject.methodCount();
+    const auto memberOffset = QObject::staticMetaObject.methodCount();
 
-    const QMetaObject* meta = metaObject();
+    const auto meta = metaObject();
 
-    int count = meta->methodCount();
+    auto count = meta->methodCount();
 
     for (int i = memberOffset ; i < count ;i++) {
         QMetaMethod method = meta->method(i);
-        if (method.name() == "dispatcherChanged") {
+        if (method.name() == QByteArray{"dispatcherChanged"}) {
             continue;
         }
 
         if (method.methodType() == QMetaMethod::Signal) {
-            QFSignalProxy* proxy = new QFSignalProxy(this);
+            auto proxy = new QFSignalProxy(this);
             proxy->bind(this, i, engine, dispatcher);
             m_proxyList << proxy;
         }
@@ -145,8 +145,8 @@ QFDispatcher *QFActionCreator::dispatcher() const
 void QFActionCreator::setDispatcher(QFDispatcher *value)
 {
     m_dispatcher = value;
-    for (int i = 0 ; i < m_proxyList.size();i++) {
-        m_proxyList[i]->setDispatcher(m_dispatcher);
+    for (auto &proxy : m_proxyList) {
+        proxy->setDispatcher(m_dispatcher);
     }
 
     emit dispatcherChanged();

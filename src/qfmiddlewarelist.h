@@ -20,7 +20,7 @@ public slots:
 
     void apply(QObject* target);
 
-    void next(int senderId, QString type, QJSValue message);
+    void next(int senderId, const QString &type, const QJSValue &message);
 
 protected:
     void classBegin();

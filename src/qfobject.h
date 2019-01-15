@@ -13,7 +13,7 @@ class QFObject : public QObject
     Q_CLASSINFO("DefaultProperty", "children")
 
 public:
-    explicit QFObject(QObject *parent = 0);
+    explicit QFObject(QObject *parent = nullptr);
 
     QQmlListProperty<QObject> children();
 

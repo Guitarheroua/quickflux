@@ -12,7 +12,7 @@ class QFAppListenerGroup : public QQuickItem
     Q_PROPERTY(QList<int> waitFor READ waitFor WRITE setWaitFor NOTIFY waitForChanged)
 
 public:
-    QFAppListenerGroup(QQuickItem* parent = 0);
+    QFAppListenerGroup(QQuickItem* parent = nullptr);
 
     QList<int> listenerIds() const;
 

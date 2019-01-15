@@ -17,7 +17,7 @@ void QFAppScriptDispatcherWrapper::setType(const QString &type)
     m_type = type;
 }
 
-void QFAppScriptDispatcherWrapper::dispatch(QJSValue arguments)
+void QFAppScriptDispatcherWrapper::dispatch(const QJSValue &arguments)
 {
     if (m_dispatcher.isNull()) {
         qWarning() << "AppScript::Unexcepted condition: AppDispatcher is not present.";

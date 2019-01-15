@@ -21,7 +21,7 @@ class QFFilter : public QObject, public QQmlParserStatus
     Q_CLASSINFO("DefaultProperty", "__children")
 
 public:
-    explicit QFFilter(QObject *parent = 0);
+    explicit QFFilter(QObject *parent = nullptr);
 
     QString type() const;
 
@@ -34,7 +34,7 @@ public:
     QQmlListProperty<QObject> children();
 
 signals:
-    void dispatched(QString type, QJSValue message);
+    void dispatched(const QString &type, const QJSValue &message);
 
     void typeChanged();
 
@@ -45,8 +45,8 @@ protected:
     void componentComplete();
 
 private slots:
-    void filter(QString type, QJSValue message);
-    void filter(QString type, QVariant message);
+    void filter(const QString &type, const QJSValue &message);
+    void filter(const QString &type, const QVariant &message);
 
 private:
     QStringList m_types;

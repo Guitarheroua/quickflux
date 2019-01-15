@@ -21,7 +21,7 @@ static QObject *appDispatcherProvider(QQmlEngine *engine, QJSEngine *scriptEngin
     Q_UNUSED(engine);
     Q_UNUSED(scriptEngine);
 
-    QFAppDispatcher* object = new QFAppDispatcher();
+    auto object = new QFAppDispatcher();
     object->setEngine(engine);
 
     return object;
@@ -31,7 +31,7 @@ static QObject* hydrateProvider(QQmlEngine *engine, QJSEngine *scriptEngine) {
     Q_UNUSED(engine);
     Q_UNUSED(scriptEngine);
 
-    QFHydrate* object = new QFHydrate();
+    auto object = new QFHydrate();
     return object;
 }
 

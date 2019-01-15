@@ -5,10 +5,10 @@ void QuickFlux::printException(QJSValue value)
 {
     if (value.isError()) {
         QString message = QString("%1:%2: %3: %4")
-                          .arg(value.property("fileName").toString())
-                          .arg(value.property("lineNumber").toString())
-                          .arg(value.property("name").toString())
-                          .arg(value.property("message").toString());
+                          .arg(value.property(QLatin1String{"fileName"}).toString())
+                          .arg(value.property(QLatin1String{"lineNumber"}).toString())
+                          .arg(value.property(QLatin1String{"name"}).toString())
+                          .arg(value.property(QLatin1String{"message"}).toString());
         qWarning() << message;
     }
 }

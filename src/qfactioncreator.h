@@ -14,14 +14,14 @@ class QFActionCreator : public QObject, public QQmlParserStatus
     Q_PROPERTY(QFDispatcher* dispatcher READ dispatcher WRITE setDispatcher NOTIFY dispatcherChanged)
 
 public:
-    explicit QFActionCreator(QObject *parent = 0);
+    explicit QFActionCreator(QObject *parent = nullptr);
 
     QFDispatcher *dispatcher() const;
     void setDispatcher(QFDispatcher *value);
 
 public slots:
     QString genKeyTable();
-    void dispatch(QString type, QJSValue message = QJSValue());
+    void dispatch(const QString &type, const QJSValue &message = QJSValue());
 
 signals:
     void dispatcherChanged();

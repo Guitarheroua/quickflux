@@ -128,21 +128,21 @@ QQmlListProperty<QObject> QFStore::children()
     return QQmlListProperty<QObject>(qobject_cast<QObject*>(this), m_children);
 }
 
-void QFStore::dispatch(QString type, QJSValue message)
+void QFStore::dispatch(const QString &type, const QJSValue &message)
 {
-    QQmlEngine* engine = qmlEngine(this);
+    auto engine = qmlEngine(this);
     QF_PRECHECK_DISPATCH(engine, type, message);
 
-    foreach(QObject* child , m_children) {
-        QFStore* store = qobject_cast<QFStore*>(child);
+    for(const auto &child : m_children) {
+        auto store = qobject_cast<QFStore*>(child);
         if (!store) {
             continue;
         }
         store->dispatch(type, message);
     }
 
-    foreach(QObject* child , m_redispatchTargets) {
-        QFStore* store = qobject_cast<QFStore*>(child);
+    for(const auto &child : m_redispatchTargets) {
+        auto store = qobject_cast<QFStore*>(child);
 
         if (!store) {
             continue;
@@ -151,21 +151,21 @@ void QFStore::dispatch(QString type, QJSValue message)
     }
 
     if (m_filterFunctionEnabled) {
-        const QMetaObject *meta = metaObject();
+        const auto meta = metaObject();
         QByteArray signature;
         int index;
 
         signature = QMetaObject::normalizedSignature(QString("%1(QVariant)").arg(type).toUtf8().constData());
         if ( (index = meta->indexOfMethod(signature.constData())) >= 0 ) {
-            QMetaMethod method = meta->method(index);
-            QVariant value = QVariant::fromValue<QJSValue>(message);
+            auto method = meta->method(index);
+            auto value = QVariant::fromValue<QJSValue>(message);
 
             method.invoke(this,Qt::DirectConnection, Q_ARG(QVariant, value));
         }
 
         signature = QMetaObject::normalizedSignature(QString("%1()").arg(type).toUtf8().constData());
         if ( (index = meta->indexOfMethod(signature.constData())) >= 0 ) {
-            QMetaMethod method = meta->method(index);
+            auto method = meta->method(index);
 
             method.invoke(this);
         }
@@ -181,8 +181,8 @@ void QFStore::bind(QObject *source)
 
 void QFStore::setup()
 {
-    QFActionCreator *creator = 0;
-    QFDispatcher* dispatcher = 0;
+    QFActionCreator *creator{};
+    QFDispatcher* dispatcher{};
 
     creator = qobject_cast<QFActionCreator*>(m_bindSource.data());
 
@@ -212,13 +212,13 @@ void QFStore::setup()
     m_dispatcher = dispatcher;
 
     if (!m_actionCreator.isNull()) {
-        connect(m_actionCreator.data(),SIGNAL(dispatcherChanged()),
-                this,SLOT(setup()));
+        connect(m_actionCreator.data(), &QFActionCreator::dispatcherChanged,
+                this, &QFStore::setup);
     }
 
     if (!m_dispatcher.isNull()) {
-        connect(dispatcher,SIGNAL(dispatched(QString,QJSValue)),
-                this,SLOT(dispatch(QString,QJSValue)));
+        connect(dispatcher, &QFDispatcher::dispatched,
+                this, &QFStore::dispatch);
     }
 
 }

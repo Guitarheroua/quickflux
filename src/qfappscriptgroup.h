@@ -10,7 +10,7 @@ class QFAppScriptGroup : public QQuickItem
     Q_PROPERTY(QJSValue scripts READ scripts WRITE setScripts NOTIFY scriptsChanged)
 
 public:
-    QFAppScriptGroup(QQuickItem* parent = 0);
+    QFAppScriptGroup(QQuickItem* parent = nullptr);
 
     QJSValue scripts() const;
 

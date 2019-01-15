@@ -63,14 +63,14 @@ void QFMiddlewareList::apply(QObject *source)
     setApplyTarget(source);
 }
 
-void QFMiddlewareList::next(int senderIndex, QString type, QJSValue message)
+void QFMiddlewareList::next(int senderIndex, const QString &type, const QJSValue &message)
 {
     QJSValueList args;
 
     args << QJSValue(senderIndex + 1);
     args << QJSValue(type);
     args << message;
-    QJSValue result = invoke.call(args);
+    auto result = invoke.call(args);
     if (result.isError()) {
         QuickFlux::printException(result);
     }
@@ -92,8 +92,8 @@ void QFMiddlewareList::componentComplete()
 
 void QFMiddlewareList::setup()
 {
-    QFActionCreator *creator = nullptr;
-    QFDispatcher* dispatcher = nullptr;
+    QFActionCreator *creator{};
+    QFDispatcher* dispatcher{};
 
     creator = qobject_cast<QFActionCreator*>(m_applyTarget.data());
     if (creator) {
@@ -103,7 +103,7 @@ void QFMiddlewareList::setup()
     }
 
     if (creator == nullptr && dispatcher == nullptr) {
-        qWarning() << "Middlewares.apply(): Invalid input";
+        qWarning() << QLatin1String{"Middlewares.apply(): Invalid input"};
     }
 
     if (m_actionCreator.data() == creator &&
@@ -120,7 +120,7 @@ void QFMiddlewareList::setup()
 
     if (!m_dispatcher.isNull() &&
         m_dispatcher.data() != dispatcher) {
-        QFHook* hook = m_dispatcher->hook();
+        auto hook = m_dispatcher->hook();
         m_dispatcher->setHook(nullptr);
         m_dispatcher->disconnect(this);
         if (hook) {
@@ -132,12 +132,12 @@ void QFMiddlewareList::setup()
     m_dispatcher = dispatcher;
 
     if (!m_actionCreator.isNull()) {
-        connect(m_actionCreator.data(),SIGNAL(dispatcherChanged()),
-                this,SLOT(setup()));
+        connect(m_actionCreator.data(), &QFActionCreator::dispatcherChanged,
+                this, &QFMiddlewareList::setup);
     }
 
     if (!m_dispatcher.isNull()) {
-        QFMiddlewaresHook* hook = new QFMiddlewaresHook();
+        auto hook = new QFMiddlewaresHook();
         hook->setParent(this);
         hook->setup(m_engine.data(), this);
 

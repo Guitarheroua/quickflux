@@ -21,7 +21,7 @@ class QFStore : public QObject
 
 
 public:
-    explicit QFStore(QObject *parent = 0);
+    explicit QFStore(QObject *parent = nullptr);
     QQmlListProperty<QObject> children();
 
     QObject* bindSource() const;
@@ -30,14 +30,14 @@ public:
     QQmlListProperty<QObject> redispatchTargets();
 
 signals:
-    void dispatched(QString type, QJSValue message);
+    void dispatched(const QString &type, const QJSValue &message);
 
     void bindSourceChanged();
 
     void filterFunctionEnabledChanged();
 
 public slots:
-    void dispatch(QString type, QJSValue message = QJSValue());
+    void dispatch(const QString &type, const QJSValue &message = QJSValue());
 
     void bind(QObject* source);
 

@@ -82,11 +82,12 @@ AppListener {
   unless they have explicitly been set to false.
  */
 
-QFAppListener::QFAppListener(QQuickItem *parent) : QQuickItem(parent)
+QFAppListener::QFAppListener(QQuickItem *parent)
+    : QQuickItem{parent}
+      , m_alwaysOn{false}
+      , m_listenerId{0}
+      , m_listener{}
 {
-    m_alwaysOn = false;
-    m_listener = 0;
-    m_listenerId = 0;
 }
 
 QFAppListener::~QFAppListener()
@@ -107,7 +108,7 @@ void QFAppListener::setTarget(QFDispatcher *target)
         m_target->removeListener(m_listenerId);
         m_listener->disconnect(this);
         m_listener->deleteLater();
-        m_listener = 0;
+        m_listener = nullptr;
         setListenerId(0);
     }
 
@@ -121,8 +122,8 @@ void QFAppListener::setTarget(QFDispatcher *target)
 
         setListenerWaitFor();
 
-        connect(m_listener,SIGNAL(dispatched(QString,QJSValue)),
-                this,SLOT(onMessageReceived(QString,QJSValue)));
+        connect(m_listener, &QFListener::dispatched,
+                this, &QFAppListener::onMessageReceived);
     }
 }
 
@@ -193,10 +194,10 @@ void QFAppListener::componentComplete()
 {
     QQuickItem::componentComplete();
 
-    QQmlEngine *engine = qmlEngine(this);
-    Q_ASSERT(engine);    
+    auto engine = qmlEngine(this);
+    Q_ASSERT(engine);
 
-    QFAppDispatcher* dispatcher = QFAppDispatcher::instance(engine);
+    auto dispatcher = QFAppDispatcher::instance(engine);
     if (!dispatcher) {
         qWarning() << "Unknown error: Unable to access AppDispatcher";
     } else {
@@ -209,9 +210,9 @@ void QFAppListener::onMessageReceived(QString type, QJSValue message)
     if (!isEnabled() && !m_alwaysOn)
         return;
 
-    bool dispatch = true;
+    auto dispatch = true;
 
-    QStringList rules = m_filters;
+    auto rules = m_filters;
     if (!m_filter.isEmpty()) {
         rules.append(m_filter);
     }
@@ -219,8 +220,8 @@ void QFAppListener::onMessageReceived(QString type, QJSValue message)
     if (rules.size() > 0) {
         dispatch = false;
 
-        for (int i = 0 ; i < rules.size() ; i++) {
-            if (type == rules.at(i)) {
+        for (const auto &rule : rules) {
+            if (type == rule) {
                 dispatch = true;
                 break;
             }
@@ -236,12 +237,12 @@ void QFAppListener::onMessageReceived(QString type, QJSValue message)
     if (!mapping.contains(type))
         return;
 
-    QList<QJSValue> list = mapping[type];
+    auto list = mapping[type];
 
     QList<QJSValue> arguments;
     arguments << message;
 
-    Q_FOREACH(QJSValue value,list)  {
+    for(auto &value : list)  {
         if (value.isCallable()) {
             value.call(arguments);
         }

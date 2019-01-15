@@ -93,13 +93,14 @@ AppScript::run() / AppScript::exit() clear all the registered callback completel
  This signal is emitted when the script is finished.
  */
 
-QFAppScript::QFAppScript(QQuickItem *parent) : QQuickItem(parent)
+QFAppScript::QFAppScript(QQuickItem *parent)
+    : QQuickItem(parent)
+      , m_running{false}
+      , m_processing{false}
+      , m_listenerId{0}
+      , m_autoExit{true}
+      , m_listener{}
 {
-    m_running = false;
-    m_processing = false;
-    m_listenerId = 0;
-    m_listener = 0;
-    m_autoExit = true;
 }
 
 /*! \qmlmethod AppScript::exit(int returnCode)
@@ -123,7 +124,7 @@ void QFAppScript::exit(int returnCode)
 
  */
 
-void QFAppScript::run(QJSValue message)
+void QFAppScript::run(const QJSValue &message)
 {
     if (m_processing) {
         qWarning() << "AppScript::run(): Don't call run() within script / wait callback";
@@ -144,7 +145,7 @@ void QFAppScript::run(QJSValue message)
 
     emit started();
 
-    QQmlExpression expr(m_script);
+    auto expr = QQmlExpression(m_script);
 
     if (!m_script.isEmpty()) {
         expr.evaluate();
@@ -198,9 +199,9 @@ AppScript {
 
  */
 
-QFAppScriptRunnable *QFAppScript::once(QJSValue condition, QJSValue script)
+QFAppScriptRunnable *QFAppScript::once(const QJSValue &condition, const QJSValue &script)
 {
-    QFAppScriptRunnable* runnable = new QFAppScriptRunnable(this);
+    auto runnable = new QFAppScriptRunnable(this);
     runnable->setEngine(qmlEngine(this));
     runnable->setCondition(condition);
     runnable->setScript(script);
@@ -216,13 +217,13 @@ QFAppScriptRunnable *QFAppScript::once(QJSValue condition, QJSValue script)
   The callback will be removed on script termination.
  */
 
-void QFAppScript::on(QJSValue condition, QJSValue script)
+void QFAppScript::on(const QJSValue &condition, const QJSValue &script)
 {
-    QFAppScriptRunnable* runnable = once(condition,script);
+    auto runnable = once(condition,script);
     runnable->setIsOnceOnly(false);
 }
 
-void QFAppScript::onDispatched(QString type, QJSValue message)
+void QFAppScript::onDispatched(const QString &type, const QJSValue &message)
 {
     if (!m_runWhen.isEmpty() &&
         type == m_runWhen &&
@@ -244,7 +245,7 @@ void QFAppScript::onDispatched(QString type, QJSValue message)
     // Mark for removeal
     QList<int> marked;
 
-    for (int i = 0 ; i < m_runnables.size() ; i++) {
+    for (auto i = 0 ; i < m_runnables.size() ; i++) {
         if (m_runnables[i]->type() == type) {
             m_runnables[i]->run(message);
 
@@ -290,7 +291,7 @@ void QFAppScript::componentComplete()
 {
     QQuickItem::componentComplete();
 
-    QQmlEngine *engine = qmlEngine(this);
+    auto engine = qmlEngine(this);
     Q_ASSERT(engine);
 
 
@@ -302,8 +303,8 @@ void QFAppScript::componentComplete()
 
     setListenerWaitFor();
 
-    connect(m_listener,SIGNAL(dispatched(QString,QJSValue)),
-            this,SLOT(onDispatched(QString,QJSValue)));
+    connect(m_listener, &QFListener::dispatched,
+            this, &QFAppScript::onDispatched);
 }
 
 void QFAppScript::abort()
@@ -313,8 +314,8 @@ void QFAppScript::abort()
 
 void QFAppScript::clear()
 {
-    for (int i = 0 ; i < m_runnables.size(); i++) {
-        m_runnables[i]->deleteLater();
+    for (const auto &runnable : m_runnables) {
+        runnable->deleteLater();
     }
     m_runnables.clear();
 }

@@ -12,9 +12,9 @@
  */
 
 
-QFAppDispatcher::QFAppDispatcher(QObject *parent) : QFDispatcher(parent)
+QFAppDispatcher::QFAppDispatcher(QObject *parent)
+    : QFDispatcher(parent)
 {
-
 }
 
 /*! \fn QFAppDispatcher *QFAppDispatcher::instance(QQmlEngine *engine)
@@ -25,8 +25,7 @@ QFAppDispatcher::QFAppDispatcher(QObject *parent) : QFDispatcher(parent)
 
 QFAppDispatcher *QFAppDispatcher::instance(QQmlEngine *engine)
 {
-    QFAppDispatcher *dispatcher = qobject_cast<QFAppDispatcher*>(singletonObject(engine,"QuickFlux",1,0,"AppDispatcher"));
-
+    auto dispatcher = qobject_cast<QFAppDispatcher*>(singletonObject(engine, QLatin1String{"QuickFlux"}, 1, 0, QLatin1String{"AppDispatcher"}));
     return dispatcher;
 }
 
@@ -48,25 +47,25 @@ QFAppDispatcher *QFAppDispatcher::instance(QQmlEngine *engine)
 
  */
 
-QObject *QFAppDispatcher::singletonObject(QQmlEngine *engine, QString package, int versionMajor, int versionMinor, QString typeName)
+QObject *QFAppDispatcher::singletonObject(QQmlEngine *engine, const QString &package, int versionMajor, int versionMinor, const QString &typeName)
 {
-    QString pattern  = "import QtQuick 2.0\nimport %1 %2.%3;QtObject { property var object : %4 }";
+    auto pattern = QString{"import QtQuick 2.0\nimport %1 %2.%3;QtObject { property var object : %4 }"};
 
-    QString qml = pattern.arg(package).arg(versionMajor).arg(versionMinor).arg(typeName);
+    auto qml = pattern.arg(package).arg(versionMajor).arg(versionMinor).arg(typeName);
 
-    QObject* holder = 0;
+    QObject* holder{};
 
-    QQmlComponent comp (engine);
+    auto comp = QQmlComponent(engine);
     comp.setData(qml.toUtf8(),QUrl());
     holder = comp.create();
 
     if (!holder) {
         qWarning() << QString("QuickFlux: Failed to gain singleton object: %1").arg(typeName);
         qWarning() << QString("Error: ") << comp.errorString();
-        return 0;
+        return nullptr;
     }
 
-    QObject*object = holder->property("object").value<QObject*>();
+    auto object = holder->property("object").value<QObject*>();
     holder->deleteLater();
 
     if (!object) {

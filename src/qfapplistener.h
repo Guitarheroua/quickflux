@@ -20,7 +20,7 @@ class QFAppListener : public QQuickItem
     Q_PROPERTY(QList<int> waitFor READ waitFor WRITE setWaitFor NOTIFY waitForChanged)
 
 public:
-    explicit QFAppListener(QQuickItem *parent = 0);
+    explicit QFAppListener(QQuickItem *parent = nullptr);
     ~QFAppListener();
 
     /// Get the listening target.

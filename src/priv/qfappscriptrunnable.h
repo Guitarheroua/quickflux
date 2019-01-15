@@ -12,7 +12,7 @@ class QFAppScriptRunnable : public QObject
 {
     Q_OBJECT
 public:
-    explicit QFAppScriptRunnable(QObject *parent = 0);
+    explicit QFAppScriptRunnable(QObject *parent = nullptr);
     ~QFAppScriptRunnable();
 
     QJSValue script() const;
@@ -20,12 +20,12 @@ public:
 
     QString type() const;
 
-    void run(QJSValue message);
+    void run(const QJSValue &message);
 
     QFAppScriptRunnable *next() const;
     void setNext(QFAppScriptRunnable *next);
 
-    void setCondition(QJSValue condition);
+    void setCondition(const QJSValue &condition);
 
     void setEngine(QQmlEngine* engine);
 
@@ -37,7 +37,7 @@ public:
 signals:
 
 public slots:
-    QFAppScriptRunnable* then(QJSValue condition,QJSValue value);
+    QFAppScriptRunnable* then(const QJSValue &condition,const QJSValue &value);
 
 private:
     void setType(const QString &type);

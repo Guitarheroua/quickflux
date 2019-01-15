@@ -17,12 +17,12 @@ public:
     void setNextCallback(const QJSValue &nextCallback);
 
 signals:
-    void dispatched(QString type, QJSValue message);
+    void dispatched(const QString &type, const QJSValue &message);
     void filterFunctionEnabledChanged();
     void _nextCallbackChanged();
 
 public slots:
-    void next(QString type, QJSValue message = QJSValue());
+    void next(const QString &type, const QJSValue &message = QJSValue());
 
 private:
     bool m_filterFunctionEnabled;

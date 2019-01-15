@@ -15,12 +15,12 @@ class QFDispatcher : public QObject
 {
     Q_OBJECT
 public:
-    explicit QFDispatcher(QObject *parent = 0);
-    ~QFDispatcher();
+    explicit QFDispatcher(QObject *parent = nullptr);
+    ~QFDispatcher() = default;
 
 signals:
     /// Listeners should listen on this signal to get the latest dispatched message from AppDispatcher
-    void dispatched(QString type,QJSValue message);
+    void dispatched(const QString &type, const QJSValue &message);
 
 public slots:
     /// Dispatch a message via Dispatcher
@@ -37,11 +37,11 @@ public slots:
       wait until it is finished. It guarantees the order of messages are arrived in sequence to
       listeners
      */
-    Q_INVOKABLE void dispatch(QString type,QJSValue message = QJSValue());
+    Q_INVOKABLE void dispatch(const QString &type, const QJSValue &message = QJSValue());
 
     Q_INVOKABLE void waitFor(QList<int> ids);
 
-    Q_INVOKABLE int addListener(QJSValue callback);
+    Q_INVOKABLE int addListener(const QJSValue &callback);
 
     Q_INVOKABLE void removeListener(int id);
 
@@ -61,10 +61,10 @@ public:
 
 private slots:
     /// Invoke listener and emit the dispatched signal
-    void send(QString type,QJSValue message);
+    void send(const QString &type, const QJSValue &message);
 
 private:
-    void invokeListeners(QList<int> ids);
+    void invokeListeners(const QList<int> &ids);
 
     bool m_dispatching;
 

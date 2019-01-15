@@ -8,7 +8,7 @@ class QFHydrate : public QObject
 {
     Q_OBJECT
 public:
-    explicit QFHydrate(QObject *parent = 0);
+    explicit QFHydrate(QObject *parent = nullptr);
 
 signals:
 

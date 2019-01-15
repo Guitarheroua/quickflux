@@ -22,7 +22,7 @@ class QFAppScript : public QQuickItem
     Q_PROPERTY(bool autoExit READ autoExit WRITE setAutoExit NOTIFY autoExitChanged)
 
 public:
-    explicit QFAppScript(QQuickItem *parent = 0);
+    explicit QFAppScript(QQuickItem *parent = nullptr);
 
     QQmlScriptString script() const;
     void setScript(const QQmlScriptString &script);
@@ -58,13 +58,13 @@ signals:
 
 public slots:
     void exit(int returnCode = 0);
-    void run(QJSValue message = QJSValue());
+    void run(const QJSValue &message = QJSValue());
 
-    QFAppScriptRunnable* once(QJSValue condition, QJSValue script);
-    void on(QJSValue condition, QJSValue script);
+    QFAppScriptRunnable* once(const QJSValue &condition, const QJSValue &script);
+    void on(const QJSValue &condition, const QJSValue &script);
 
 private slots:
-    void onDispatched(QString type,QJSValue message);
+    void onDispatched(const QString &type, const QJSValue &message);
 
 private:
     virtual void componentComplete();

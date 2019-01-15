@@ -18,7 +18,7 @@ public:
     void setDispatcher(QFDispatcher *dispatcher);
 
 public slots:
-    void dispatch(QJSValue arguments);
+    void dispatch(const QJSValue &arguments);
 
 private:
     QString m_type;

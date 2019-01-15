@@ -108,11 +108,11 @@ Hydrate.rehydrate(store, {
 
 void QFHydrate::rehydrate(QObject *dest, const QVariantMap &source)
 {
-    const QMetaObject* meta = dest->metaObject();
+    const auto meta = dest->metaObject();
 
-    QMap<QString,QVariant>::const_iterator iter = source.begin();
+    auto iter = source.begin();
     while (iter != source.end()) {
-        QByteArray key = iter.key().toLocal8Bit();
+        auto key = iter.key().toLocal8Bit();
 
         int index = meta->indexOfProperty(key.constData());
         if (index < 0) {
@@ -121,8 +121,8 @@ void QFHydrate::rehydrate(QObject *dest, const QVariantMap &source)
             continue;
         }
 
-        QVariant orig = dest->property(key.constData());
-        QVariant value = source[iter.key()];
+        auto orig = dest->property(key.constData());
+        auto value = source[iter.key()];
 
         if (orig.canConvert<QObject*>()) {
             if (value.type() != QVariant::Map) {

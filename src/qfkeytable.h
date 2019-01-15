@@ -9,7 +9,7 @@ class QFKeyTable : public QObject, public QQmlParserStatus
     Q_INTERFACES(QQmlParserStatus)
 
 public:
-    explicit QFKeyTable(QObject *parent = 0);
+    explicit QFKeyTable(QObject *parent = nullptr);
 
 public slots:
     QString genHeaderFile(const QString& className);

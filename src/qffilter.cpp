@@ -104,7 +104,7 @@ void QFFilter::classBegin()
 
 void QFFilter::componentComplete()
 {
-    QObject* object = parent();
+    auto object = parent();
     m_engine = qmlEngine(this);
 
     if (!object) {
@@ -112,7 +112,7 @@ void QFFilter::componentComplete()
         return;
     }
 
-    const QMetaObject* meta = object->metaObject();
+    const auto meta = object->metaObject();
 
     if (meta->indexOfSignal("dispatched(QString,QJSValue)") >= 0) {
         connect(object,SIGNAL(dispatched(QString,QJSValue)),
@@ -127,7 +127,7 @@ void QFFilter::componentComplete()
 
 }
 
-void QFFilter::filter(QString type, QJSValue message)
+void QFFilter::filter(const QString &type, const QJSValue &message)
 {
     if (m_types.indexOf(type) >= 0) {
         QF_PRECHECK_DISPATCH(m_engine.data(), type, message);
@@ -135,10 +135,10 @@ void QFFilter::filter(QString type, QJSValue message)
     }
 }
 
-void QFFilter::filter(QString type, QVariant message)
+void QFFilter::filter(const QString &type, const QVariant &message)
 {
     if (m_types.indexOf(type) >= 0) {
-        QJSValue value = message.value<QJSValue>();
+        auto value = message.value<QJSValue>();
         QF_PRECHECK_DISPATCH(m_engine.data(), type, value);
 
         emit dispatched(type, value);
