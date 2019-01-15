@@ -123,9 +123,7 @@ void QFMiddlewareList::setup()
         auto hook = m_dispatcher->hook();
         m_dispatcher->setHook(nullptr);
         m_dispatcher->disconnect(this);
-        if (hook) {
-            delete hook;
-        }
+        delete hook;
     }
 
     m_actionCreator = creator;

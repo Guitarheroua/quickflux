@@ -30,13 +30,13 @@ public:
     void setTarget(QFDispatcher *target);
 
     /// Add a listener to the end of the listeners array for the specified message.  Multiple calls passing the same combination of event and listener will result in the listener being added multiple times.
-    Q_INVOKABLE QFAppListener* on(QString type,QJSValue callback);
+    Q_INVOKABLE QFAppListener* on(const QString &type, const QJSValue &callback);
 
     /// Remove a listener from the listener array for the specified message.
-    Q_INVOKABLE void removeListener(QString type,QJSValue callback);
+    Q_INVOKABLE void removeListener(const QString &type, const QJSValue &callback);
 
     /// Remove all the listeners for a message with type. If type is empty, it will remove all the listeners.
-    Q_INVOKABLE void removeAllListener(QString type = QString());
+    Q_INVOKABLE void removeAllListener(const QString &type = QString());
 
     /// Get the filter for incoming message
     QString filter() const;
@@ -79,7 +79,7 @@ public slots:
 private:
     virtual void componentComplete();
 
-    Q_INVOKABLE void onMessageReceived(QString name,QJSValue message);
+    Q_INVOKABLE void onMessageReceived(const QString &name, const QJSValue &message);
 
     void setListenerWaitFor();
 

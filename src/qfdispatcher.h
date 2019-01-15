@@ -39,7 +39,7 @@ public slots:
      */
     Q_INVOKABLE void dispatch(const QString &type, const QJSValue &message = QJSValue());
 
-    Q_INVOKABLE void waitFor(QList<int> ids);
+    Q_INVOKABLE void waitFor(const QList<int> &ids);
 
     Q_INVOKABLE int addListener(const QJSValue &callback);
 

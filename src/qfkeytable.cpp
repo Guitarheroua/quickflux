@@ -33,12 +33,12 @@ static QMap<int,QString> createTypes() {
     static QMap<int,QString> types
     {
         {QVariant::String, QLatin1String{"QString"}},
-        {QVariant::Int, QLatin1String{"int"}},
-        {QVariant::Double, QLatin1String{"qreal"}},
-        {QVariant::Bool, QLatin1String{"bool"}},
-        {QVariant::PointF, QLatin1String{"QPointF"}},
-        {QVariant::RectF, QLatin1String{"QRectF"}},
-    };
+            {QVariant::Int, QLatin1String{"int"}},
+            {QVariant::Double, QLatin1String{"qreal"}},
+            {QVariant::Bool, QLatin1String{"bool"}},
+            {QVariant::PointF, QLatin1String{"QPointF"}},
+            {QVariant::RectF, QLatin1String{"QRectF"}},
+        };
 
     return types;
 }
@@ -77,7 +77,7 @@ QString QFKeyTable::genHeaderFile(const QString& className)
         }
 
         if (types.contains(p.type())) {
-            clazz << QString("    static %2 %1;\n").arg(name).arg(types[p.type()]);
+            clazz << QString("    static %2 %1;\n").arg(name, types[p.type()]);
 
             if (p.type() == QVariant::PointF && !includedPointHeader) {
                 includedPointHeader = true;
@@ -121,39 +121,30 @@ QString QFKeyTable::genSourceFile(const QString &className, const QString &heade
 
             if (p.type() == QVariant::String) {
                 source << QString("%4 %1::%2 = \"%3\";\n")
-                          .arg(className)
-                          .arg(p.name())
-                          .arg(v.toString())
-                          .arg(types[p.type()]);
+                              .arg(className, p.name(), v.toString(), types[p.type()]);
 
             } else if (p.type() == QVariant::PointF) {
                 QPointF pt = v.toPointF();
 
                 source << QString("QPointF %1::%2 = QPointF(%3,%4);\n")
-                          .arg(className)
-                          .arg(p.name())
-                          .arg(pt.x())
-                          .arg(pt.y());
+                              .arg(className, p.name(), QString::number(pt.x()), QString::number(pt.y()));
 
             } else if (p.type() == QVariant::RectF) {
 
                 QRectF rect = v.toRectF();
 
                 source << QString("QRectF %1::%2 = QRect(%3,%4,%5,%6);\n")
-                          .arg(className)
-                          .arg(p.name())
-                          .arg(rect.x())
-                          .arg(rect.y())
-                          .arg(rect.width())
-                          .arg(rect.height());
+                          .arg(className
+                             , p.name()
+                             , QString::number(rect.x())
+                             , QString::number(rect.y())
+                             , QString::number(rect.width())
+                             , QString::number(rect.height()));
 
             } else {
 
                 source << QString("%4 %1::%2 = %3;\n")
-                          .arg(className)
-                          .arg(p.name())
-                          .arg(v.toString())
-                          .arg(types[p.type()]);
+                              .arg(className, p.name(), v.toString(), types[p.type()]);
             }
         }
     }

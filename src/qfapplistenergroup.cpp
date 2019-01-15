@@ -54,7 +54,7 @@ QList<int> QFAppListenerGroup::search(QQuickItem *item)
 
     for (const auto &child : childs) {
         auto subRes = search(child);
-        if (subRes.size() > 0) {
+        if (!subRes.empty()) {
             res.append(subRes);
         }
     }

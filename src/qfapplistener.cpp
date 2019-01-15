@@ -134,7 +134,7 @@ void QFAppListener::setTarget(QFDispatcher *target)
 
  */
 
-QFAppListener *QFAppListener::on(QString type, QJSValue callback)
+QFAppListener *QFAppListener::on(const QString &type, const QJSValue &callback)
 {
     QList<QJSValue> list;
 
@@ -154,7 +154,7 @@ QFAppListener *QFAppListener::on(QString type, QJSValue callback)
   Remove a listener from the listener array for the specified message.
  */
 
-void QFAppListener::removeListener(QString type, QJSValue callback)
+void QFAppListener::removeListener(const QString &type, const QJSValue &callback)
 {
     if (!mapping.contains(type)) {
         return;
@@ -181,7 +181,7 @@ void QFAppListener::removeListener(QString type, QJSValue callback)
    Remove all the listeners for a message with type. If type is empty, it will remove all the listeners.
  */
 
-void QFAppListener::removeAllListener(QString type)
+void QFAppListener::removeAllListener(const QString &type)
 {
     if (type.isEmpty()) {
         mapping.clear();
@@ -205,7 +205,7 @@ void QFAppListener::componentComplete()
     }
 }
 
-void QFAppListener::onMessageReceived(QString type, QJSValue message)
+void QFAppListener::onMessageReceived(const QString &type, const QJSValue &message)
 {
     if (!isEnabled() && !m_alwaysOn)
         return;
@@ -217,7 +217,7 @@ void QFAppListener::onMessageReceived(QString type, QJSValue message)
         rules.append(m_filter);
     }
 
-    if (rules.size() > 0) {
+    if (!rules.empty()) {
         dispatch = false;
 
         for (const auto &rule : rules) {

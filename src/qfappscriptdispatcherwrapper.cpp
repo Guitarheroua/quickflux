@@ -2,11 +2,6 @@
 #include "qfdispatcher.h"
 #include "priv/qfappscriptdispatcherwrapper.h"
 
-QFAppScriptDispatcherWrapper::QFAppScriptDispatcherWrapper()
-{
-
-}
-
 QString QFAppScriptDispatcherWrapper::type() const
 {
     return m_type;

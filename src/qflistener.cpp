@@ -21,7 +21,7 @@ void QFListener::setCallback(const QJSValue &callback)
 void QFListener::dispatch(QFDispatcher *dispatcher, const QString &type, const QJSValue &message)
 {
 
-    if (m_waitFor.size() > 0) {
+    if (!m_waitFor.empty()) {
         dispatcher->waitFor(m_waitFor);
     }
 
@@ -32,10 +32,10 @@ void QFListener::dispatch(QFDispatcher *dispatcher, const QString &type, const Q
 
         if (ret.isError()) {
             auto message = QString("%1:%2: %3: %4")
-                           .arg(ret.property(QLatin1String{"fileName"}).toString())
-                           .arg(ret.property(QLatin1String{"lineNumber"}).toString())
-                           .arg(ret.property(QLatin1String{"name"}).toString())
-                           .arg(ret.property(QLatin1String{"message"}).toString());
+                           .arg(ret.property(QLatin1String{"fileName"}).toString()
+                              , ret.property(QLatin1String{"lineNumber"}).toString()
+                              , ret.property(QLatin1String{"name"}).toString()
+                              , ret.property(QLatin1String{"message"}).toString());
             qWarning() << message;
         }
     }

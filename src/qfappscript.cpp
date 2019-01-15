@@ -155,7 +155,7 @@ void QFAppScript::run(const QJSValue &message)
         qWarning() << expr.error();
     }
 
-    if (m_runnables.size() == 0) {
+    if (m_runnables.empty()) {
         exit(0);
     }
 
@@ -282,7 +282,7 @@ void QFAppScript::onDispatched(const QString &type, const QJSValue &message)
     m_processing = false;
 
     // All the tasks are finished
-    if (m_runnables.size() == 0 && m_autoExit) {
+    if (m_runnables.empty() && m_autoExit) {
         exit(0);
     }
 }

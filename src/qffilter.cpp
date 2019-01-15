@@ -83,11 +83,10 @@ QFFilter::QFFilter(QObject *parent) : QObject(parent)
 
 QString QFFilter::type() const
 {
-    if (m_types.size() == 0) {
-        return "";
-    } else {
-        return m_types[0];
-    }
+    if (m_types.empty())
+        return QLatin1String{""};
+
+    return m_types[0];
 }
 
 void QFFilter::setType(const QString &type)

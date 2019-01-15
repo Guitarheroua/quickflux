@@ -25,7 +25,7 @@ static auto dehydratorFunction = [](const QStringList& ignoreList) -> std::funct
             QVariant value = source->property(name);
 
             if (value.canConvert<QObject*>()) {
-                QObject* object = value.value<QObject*>();
+                auto object = value.value<QObject*>();
                 if (!object) {
                     continue;
                 }

@@ -104,6 +104,7 @@ QFDispatcher::QFDispatcher(QObject *parent)
     : QObject(parent)
       , m_dispatching{false}
       , nextListenerId{1}
+      , dispatchingListenerId{}
 {
 }
 
@@ -156,7 +157,7 @@ void QFDispatcher::dispatch(const QString &type, const QJSValue &message)
     m_dispatching = true;
     process(type,message);
 
-    while (m_queue.size() > 0) {
+    while (!m_queue.empty()) {
         auto pair = m_queue.dequeue();
         process(pair.first,pair.second);
     }
@@ -172,9 +173,9 @@ void QFDispatcher::dispatch(const QString &type, const QJSValue &message)
 
  */
 
-void QFDispatcher::waitFor(QList<int> ids)
+void QFDispatcher::waitFor(const QList<int> &ids)
 {
-    if (!m_dispatching || ids.size() == 0)
+    if (!m_dispatching || ids.empty())
         return;
 
     int id = dispatchingListenerId;

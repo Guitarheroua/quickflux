@@ -7,7 +7,6 @@
 QFAppScriptRunnable::QFAppScriptRunnable(QObject *parent)
     : QObject(parent)
       , m_next{}
-      , m_engine{}
       , m_isSignalCondition{false}
       , m_isOnceOnly{true}
 {
@@ -86,10 +85,10 @@ void QFAppScriptRunnable::run(const QJSValue &message)
 
     if (ret.isError()) {
         QString message = QString("%1:%2: %3: %4")
-                          .arg(ret.property(QLatin1String{"fileName"}).toString())
-                          .arg(ret.property(QLatin1String{"lineNumber"}).toString())
-                          .arg(ret.property(QLatin1String{"name"}).toString())
-                              .arg(ret.property(QLatin1String{"message"}).toString());
+                          .arg(ret.property(QLatin1String{"fileName"}).toString()
+                              , ret.property(QLatin1String{"lineNumber"}).toString()
+                              , ret.property(QLatin1String{"name"}).toString()
+                              , ret.property(QLatin1String{"message"}).toString());
         qWarning() << message;
     }
 
