@@ -48,13 +48,13 @@ QString QFActionCreator::genKeyTable()
 {
     QStringList imports, header, footer, properties;
 
-    imports << QLatin1String{"pragma Singleton"}
-            << QLatin1String{"import QtQuick 2.0"}
-            << QLatin1String{"import QuickFlux 1.0\n"};
+    imports << QStringLiteral("pragma Singleton")
+            << QStringLiteral("import QtQuick 2.0")
+            << QStringLiteral("import QuickFlux 1.0\n");
 
-    header << QLatin1String{"KeyTable {\n"};
+    header << QStringLiteral("KeyTable {\n");
 
-    footer <<  QLatin1String{"}"};
+    footer <<  QStringLiteral(")");
 
     const auto memberOffset = QObject::staticMetaObject.methodCount();
 
@@ -68,14 +68,14 @@ QString QFActionCreator::genKeyTable()
             continue;
         }
         if (method.methodType() == QMetaMethod::Signal) {
-            properties << QString("    property string %1;\n").arg(QString(method.name()));
+            properties << QStringLiteral("    property string %1;\n").arg(QString(method.name()));
         }
     }
 
     QStringList content;
     content << imports << header << properties << footer;
 
-    return content.join("\n");
+    return content.join('\n');
 }
 
 void QFActionCreator::dispatch(const QString &type, const QJSValue &message)
@@ -95,7 +95,7 @@ void QFActionCreator::componentComplete()
     auto engine = qmlEngine(this);
 
     if (m_dispatcher.isNull()) {
-        setDispatcher(qobject_cast<QFDispatcher*>(QFAppDispatcher::instance(engine)));
+        setDispatcher(QFAppDispatcher::instance(engine));
     }
 
     auto dispatcher = m_dispatcher.data();

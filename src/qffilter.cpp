@@ -84,7 +84,7 @@ QFFilter::QFFilter(QObject *parent) : QObject(parent)
 QString QFFilter::type() const
 {
     if (m_types.empty())
-        return QLatin1String{""};
+        return QStringLiteral("");
 
     return m_types[0];
 }
@@ -107,7 +107,7 @@ void QFFilter::componentComplete()
     m_engine = qmlEngine(this);
 
     if (!object) {
-        qDebug() << "Filter - Disabled due to missing parent.";
+        qDebug() << QStringLiteral("Filter - Disabled due to missing parent.");
         return;
     }
 
@@ -120,7 +120,7 @@ void QFFilter::componentComplete()
         connect(object,SIGNAL(dispatched(QString,QVariant)),
                 this,SLOT(filter(QString,QVariant)));
     } else {
-        qDebug() << "Filter - Disabled due to missing dispatched signal in parent object.";
+        qDebug() << QStringLiteral("Filter - Disabled due to missing dispatched signal in parent object.");
         return;
     }
 

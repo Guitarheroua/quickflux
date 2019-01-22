@@ -23,7 +23,7 @@ void QFMiddlewaresHook::setup(QQmlEngine *engine, QObject *middlewares)
     auto mobj = engine->newQObject(middlewares);
     auto hobj = engine->newQObject(this);
 
-    QString source = QLatin1String{"function (middlewares, hook) {"
+    QString source = QStringLiteral("function (middlewares, hook) {"
                                    "  function create(senderIndex) {"
                                    "    return function (type, message) {"
                                    "      hook.next(senderIndex, type , message);"
@@ -34,7 +34,7 @@ void QFMiddlewaresHook::setup(QQmlEngine *engine, QObject *middlewares)
                                    "    var m = data[i];"
                                    "    m._nextCallback = create(i);"
                                    "  }"
-                                   "}"};
+                                    "}");
 
     auto function = engine->evaluate(source);
 
@@ -48,7 +48,7 @@ void QFMiddlewaresHook::setup(QQmlEngine *engine, QObject *middlewares)
         QuickFlux::printException(ret);
     }
 
-    source = QLatin1String{"function (middlewares, hook) {"
+    source = QStringLiteral("function (middlewares, hook) {"
                            "  return function invoke(receiverIndex, type , message) {"
                            "     if (receiverIndex >= middlewares.data.length) {"
                            "       hook.resolve(type, message);"
@@ -63,7 +63,7 @@ void QFMiddlewaresHook::setup(QQmlEngine *engine, QObject *middlewares)
                            "       invoke(receiverIndex + 1,type, message);"
                            "     }"
                            "  }"
-                           "}"};
+                            "}");
 
     function = engine->evaluate(source);
     invoke = function.call(args);

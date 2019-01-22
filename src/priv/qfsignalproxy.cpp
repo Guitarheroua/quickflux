@@ -25,7 +25,7 @@ void QFSignalProxy::bind(QObject *source, int signalIdx, QQmlEngine* engine, QFD
     }
 
     if (!QMetaObject::connect(source, signalIdx, this, memberOffset, Qt::AutoConnection, nullptr)) {
-        qWarning() << QLatin1String{"Failed to bind signal"};
+        qWarning() << QStringLiteral("Failed to bind signal");
     }
 }
 

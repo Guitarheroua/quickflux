@@ -246,15 +246,15 @@ void QFAppScript::onDispatched(const QString &type, const QJSValue &message)
     QList<int> marked;
 
     for (auto i = 0 ; i < m_runnables.size() ; i++) {
-        if (m_runnables[i]->type() == type) {
-            m_runnables[i]->run(message);
+        if (m_runnables.at(i)->type() == type) {
+            m_runnables.at(i)->run(message);
 
             if (!m_running) {
                 // If exit() is called in runnable. It shoud not process any more.
                 break;
             }
 
-            if (m_runnables[i]->isOnceOnly()) {
+            if (m_runnables.at(i)->isOnceOnly()) {
                 marked << i;
             }
         }

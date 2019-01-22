@@ -88,24 +88,24 @@ void QFAppScriptGroup::setScripts(const QJSValue &scripts)
     m_scripts = scripts;
 
     if (!scripts.isArray()) {
-        qWarning() << QLatin1String{"AppScriptGroup: Invalid scripts property"};
+        qWarning() << QStringLiteral("AppScriptGroup: Invalid scripts property");
         return;
     }
 
-    int count = scripts.property(QLatin1String{"length"}).toInt();
+    int count = scripts.property(QStringLiteral("length")).toInt();
 
     for (int i = 0 ; i < count ; i++) {
         auto item = scripts.property(i);
 
         if (!item.isQObject()) {
-            qWarning() << QLatin1String{"AppScriptGroup: Invalid scripts property"};
+            qWarning() << QStringLiteral("AppScriptGroup: Invalid scripts property");
             continue;
         }
 
         auto object = qobject_cast<QFAppScript*>(item.toQObject());
 
         if (!object) {
-            qWarning() << QLatin1String{"AppScriptGroup: Invalid scripts property"};
+            qWarning() << QStringLiteral("AppScriptGroup: Invalid scripts property");
             continue;
         }
         objects << object;

@@ -32,12 +32,12 @@ KeyTable {
 static QMap<int,QString> createTypes() {
     static QMap<int,QString> types
     {
-        {QVariant::String, QLatin1String{"QString"}},
-            {QVariant::Int, QLatin1String{"int"}},
-            {QVariant::Double, QLatin1String{"qreal"}},
-            {QVariant::Bool, QLatin1String{"bool"}},
-            {QVariant::PointF, QLatin1String{"QPointF"}},
-            {QVariant::RectF, QLatin1String{"QRectF"}},
+        {QVariant::String, QStringLiteral("QString")},
+            {QVariant::Int, QStringLiteral("int")},
+            {QVariant::Double, QStringLiteral("qreal")},
+            {QVariant::Bool, QStringLiteral("bool")},
+            {QVariant::PointF, QStringLiteral("QPointF")},
+            {QVariant::RectF, QStringLiteral("QRectF")},
         };
 
     return types;
@@ -56,11 +56,11 @@ QString QFKeyTable::genHeaderFile(const QString& className)
     auto includedPointHeader = false;
     auto includedRectHeader = false;
 
-    header << QLatin1String{"#pragma once"};
-    header << QLatin1String{"#include <QString>\n"};
+    header << QStringLiteral("#pragma once");
+    header << QStringLiteral("#include <QString>\n");
 
     clazz << QString("class %1 {\n").arg(className);
-    clazz << QLatin1String{"public:\n"};
+    clazz << QStringLiteral("public:\n");
 
     const auto meta = metaObject();
 
@@ -72,7 +72,7 @@ QString QFKeyTable::genHeaderFile(const QString& className)
 
         QString name(p.name());
 
-        if (name == QLatin1String{"objectName"}) {
+        if (name == QStringLiteral("objectName")) {
             continue;
         }
 
@@ -81,16 +81,16 @@ QString QFKeyTable::genHeaderFile(const QString& className)
 
             if (p.type() == QVariant::PointF && !includedPointHeader) {
                 includedPointHeader = true;
-                header << QLatin1String{"#include <QPointF>"};
+                header << QStringLiteral("#include <QPointF>");
             } else if (p.type() == QVariant::RectF && !includedRectHeader) {
                 includedRectHeader = true;
-                header << QLatin1String{"#include <QRectF>"};
+                header << QStringLiteral("#include <QRectF>");
             }
         }
 
     }
 
-    clazz << QLatin1String{"};\n"};
+    clazz << QStringLiteral("};\n");
 
     QStringList content;
     content << header << clazz;
@@ -112,7 +112,7 @@ QString QFKeyTable::genSourceFile(const QString &className, const QString &heade
     for (int i = 0 ; i < count ; i++) {
         const auto p = meta->property(i);
         QString name(p.name());
-        if (name == QLatin1String{"objectName"}) {
+        if (name == QStringLiteral("objectName")) {
             continue;
         }
 
@@ -166,7 +166,7 @@ void QFKeyTable::componentComplete()
         const auto p = meta->property(i);
         QString name(p.name());
         if (p.type() != QVariant::String ||
-            name == QLatin1String{"objectName"}) {
+            name == QStringLiteral("objectName")) {
             continue;
         }
 

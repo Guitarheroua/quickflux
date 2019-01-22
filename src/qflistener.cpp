@@ -31,11 +31,11 @@ void QFListener::dispatch(QFDispatcher *dispatcher, const QString &type, const Q
         auto ret = m_callback.call(args);
 
         if (ret.isError()) {
-            auto message = QString("%1:%2: %3: %4")
-                           .arg(ret.property(QLatin1String{"fileName"}).toString()
-                              , ret.property(QLatin1String{"lineNumber"}).toString()
-                              , ret.property(QLatin1String{"name"}).toString()
-                              , ret.property(QLatin1String{"message"}).toString());
+            auto message = QStringLiteral("%1:%2: %3: %4")
+                               .arg(ret.property(QStringLiteral("fileName")).toString()
+                                        , ret.property(QStringLiteral("lineNumber")).toString()
+                                        , ret.property(QStringLiteral("name")).toString()
+                                        , ret.property(QStringLiteral("message")).toString());
             qWarning() << message;
         }
     }

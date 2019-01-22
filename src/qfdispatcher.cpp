@@ -278,7 +278,7 @@ void QFDispatcher::invokeListeners(const QList<int> &ids)
 {
     for (const auto &next : ids) {
         if (waitingListeners.contains(next)) {
-            qWarning() << QLatin1String{"AppDispatcher: Cyclic dependency detected"};
+            qWarning() << QStringLiteral("AppDispatcher: Cyclic dependency detected");
         }
 
         if (!pendingListeners.contains(next))

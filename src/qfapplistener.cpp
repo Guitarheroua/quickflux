@@ -237,7 +237,7 @@ void QFAppListener::onMessageReceived(const QString &type, const QJSValue &messa
     if (!mapping.contains(type))
         return;
 
-    auto list = mapping[type];
+    auto list = mapping.value(type);
 
     QList<QJSValue> arguments;
     arguments << message;
