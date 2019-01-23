@@ -103,7 +103,7 @@ void QFMiddlewareList::setup()
     }
 
     if (creator == nullptr && dispatcher == nullptr) {
-        qWarning() << QLatin1String{"Middlewares.apply(): Invalid input"};
+        qWarning() << QStringLiteral("Middlewares.apply(): Invalid input");
     }
 
     if (m_actionCreator.data() == creator &&

@@ -166,7 +166,7 @@ void QFKeyTable::componentComplete()
         const auto p = meta->property(i);
         QString name(p.name());
         if (p.type() != QVariant::String ||
-            name == QLatin1String{"objectName"}) {
+            name == QStringLiteral("objectName")) {
             continue;
         }
 
