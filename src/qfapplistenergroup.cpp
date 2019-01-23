@@ -11,12 +11,12 @@ QFAppListenerGroup::QFAppListenerGroup(QQuickItem* parent)
 
 }
 
-QList<int> QFAppListenerGroup::listenerIds() const
+QVector<int> QFAppListenerGroup::listenerIds() const
 {
     return m_listenerIds;
 }
 
-void QFAppListenerGroup::setListenerIds(const QList<int> &listenerIds)
+void QFAppListenerGroup::setListenerIds(const QVector<int> &listenerIds)
 {
     m_listenerIds = listenerIds;
     emit listenerIdsChanged();
@@ -39,15 +39,15 @@ void QFAppListenerGroup::componentComplete()
     setListenerIds(ids);
 }
 
-QList<int> QFAppListenerGroup::search(QQuickItem *item)
+QVector<int> QFAppListenerGroup::search(QQuickItem *item)
 {
-    QList<int> res;
+    QVector<int> res;
 
     auto listener = qobject_cast<QFAppListener*>(item);
 
     if (listener) {
         res.append(listener->listenerId());
-        listener->setWaitFor(QList<int>() << m_listenerId);
+        listener->setWaitFor(QVector<int>() << m_listenerId);
     }
 
     auto childs = item->childItems();
@@ -66,12 +66,12 @@ void QFAppListenerGroup::setListenerWaitFor()
     m_listener->setWaitFor(m_waitFor);
 }
 
-QList<int> QFAppListenerGroup::waitFor() const
+QVector<int> QFAppListenerGroup::waitFor() const
 {
     return m_waitFor;
 }
 
-void QFAppListenerGroup::setWaitFor(const QList<int> &waitFor)
+void QFAppListenerGroup::setWaitFor(const QVector<int> &waitFor)
 {
     m_waitFor = waitFor;
     setListenerWaitFor();

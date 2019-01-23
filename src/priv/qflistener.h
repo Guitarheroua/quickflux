@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QJSValue>
+#include <QVector>
 
 class QFDispatcher;
 
@@ -25,9 +26,9 @@ public:
 
     void setListenerId(int listenerId);
 
-    QList<int> waitFor() const;
+    QVector<int> waitFor() const;
 
-    void setWaitFor(const QList<int> &waitFor);
+    void setWaitFor(const QVector<int> &waitFor);
 
 signals:
     void dispatched(const QString &type, const QJSValue &message);
@@ -39,7 +40,7 @@ private:
 
     int m_listenerId;
 
-    QList<int> m_waitFor;
+    QVector<int> m_waitFor;
 };
 
 #endif // QFLISTENER_H

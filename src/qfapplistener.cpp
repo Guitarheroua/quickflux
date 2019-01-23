@@ -136,10 +136,10 @@ void QFAppListener::setTarget(QFDispatcher *target)
 
 QFAppListener *QFAppListener::on(const QString &type, const QJSValue &callback)
 {
-    QList<QJSValue> list;
+    QVector<QJSValue> list;
 
     if (mapping.contains(type)) {
-        list = mapping[type];
+        list = mapping.value(type);
     }
 
     list.append(callback);
@@ -160,7 +160,7 @@ void QFAppListener::removeListener(const QString &type, const QJSValue &callback
         return;
     };
 
-    QList<QJSValue> list;
+    QVector<QJSValue> list;
     list = mapping[type];
 
     int index = -1;
@@ -237,14 +237,14 @@ void QFAppListener::onMessageReceived(const QString &type, const QJSValue &messa
     if (!mapping.contains(type))
         return;
 
-    auto list = mapping[type];
+    auto list = mapping.value(type);
 
-    QList<QJSValue> arguments;
+    QVector<QJSValue> arguments;
     arguments << message;
 
     for(auto &value : list)  {
         if (value.isCallable()) {
-            value.call(arguments);
+            value.call(arguments.toList());
         }
     }
 
@@ -278,12 +278,12 @@ AppListener {
 
  */
 
-QList<int> QFAppListener::waitFor() const
+QVector<int> QFAppListener::waitFor() const
 {
     return m_waitFor;
 }
 
-void QFAppListener::setWaitFor(const QList<int> &waitFor)
+void QFAppListener::setWaitFor(const QVector<int> &waitFor)
 {
     m_waitFor = waitFor;
     setListenerWaitFor();

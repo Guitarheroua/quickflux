@@ -173,7 +173,7 @@ void QFDispatcher::dispatch(const QString &type, const QJSValue &message)
 
  */
 
-void QFDispatcher::waitFor(const QList<int> &ids)
+void QFDispatcher::waitFor(const QVector<int> &ids)
 {
     if (!m_dispatching || ids.empty())
         return;
@@ -224,7 +224,7 @@ int QFDispatcher::addListener(QFListener *listener)
 void QFDispatcher::removeListener(int id)
 {
     if (m_listeners.contains(id)) {
-        auto listener = m_listeners[id].data();
+        auto listener = m_listeners.value(id).data();
         if (listener->parent() == this) {
             listener->deleteLater();
         }
@@ -262,7 +262,7 @@ void QFDispatcher::send(const QString &type, const QJSValue &message)
     waitingListeners.clear();
 
     QMapIterator<int, QPointer<QFListener> > iter(m_listeners);
-    QList<int> ids;
+    QVector<int> ids;
     while (iter.hasNext()) {
         iter.next();
         pendingListeners[iter.key()] = true;
@@ -274,11 +274,11 @@ void QFDispatcher::send(const QString &type, const QJSValue &message)
     emit dispatched(type,message);
 }
 
-void QFDispatcher::invokeListeners(const QList<int> &ids)
+void QFDispatcher::invokeListeners(const QVector<int> &ids)
 {
     for (const auto &next : ids) {
         if (waitingListeners.contains(next)) {
-            qWarning() << QLatin1String{"AppDispatcher: Cyclic dependency detected"};
+            qWarning() << QStringLiteral("AppDispatcher: Cyclic dependency detected");
         }
 
         if (!pendingListeners.contains(next))
@@ -287,7 +287,7 @@ void QFDispatcher::invokeListeners(const QList<int> &ids)
         pendingListeners.remove(next);
         dispatchingListenerId = next;
 
-        auto listener = m_listeners[next].data();
+        auto listener = m_listeners.value(next).data();
 
         if (listener) {
             listener->dispatch(this,dispatchingMessageType,dispatchingMessage);

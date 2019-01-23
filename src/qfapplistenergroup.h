@@ -8,19 +8,19 @@
 class QFAppListenerGroup : public QQuickItem
 {
     Q_OBJECT
-    Q_PROPERTY(QList<int> listenerIds READ listenerIds WRITE setListenerIds NOTIFY listenerIdsChanged)
-    Q_PROPERTY(QList<int> waitFor READ waitFor WRITE setWaitFor NOTIFY waitForChanged)
+    Q_PROPERTY(QVector<int> listenerIds READ listenerIds WRITE setListenerIds NOTIFY listenerIdsChanged)
+    Q_PROPERTY(QVector<int> waitFor READ waitFor WRITE setWaitFor NOTIFY waitForChanged)
 
 public:
     QFAppListenerGroup(QQuickItem* parent = nullptr);
 
-    QList<int> listenerIds() const;
+    QVector<int> listenerIds() const;
 
-    void setListenerIds(const QList<int> &listenerIds);
+    void setListenerIds(const QVector<int> &listenerIds);
 
-    QList<int> waitFor() const;
+    QVector<int> waitFor() const;
 
-    void setWaitFor(const QList<int> &waitFor);
+    void setWaitFor(const QVector<int> &waitFor);
 
 public slots:
 
@@ -32,13 +32,13 @@ signals:
 private:
     virtual void componentComplete();
 
-    QList<int> search(QQuickItem* item);
+    QVector<int> search(QQuickItem* item);
 
     void setListenerWaitFor();
 
-    QList<int> m_waitFor;
+    QVector<int> m_waitFor;
 
-    QList<int> m_listenerIds;
+    QVector<int> m_listenerIds;
     int m_listenerId;
     QFListener* m_listener;
 };

@@ -37,9 +37,9 @@ static auto dehydratorFunction = [](const QStringList& ignoreList) -> std::funct
     };
 };
 
-static auto dehydrateQObject = dehydratorFunction(QStringList() << "parent" << "objectName");
-static auto dehydrateQFObject = dehydratorFunction(QStringList() << "parent" << "objectName" << "children");
-static auto dehydrateQFStore = dehydratorFunction(QStringList() << "parent" << "objectName" << "children" << "bindSource" << "redispatchTargets" << "filterFunctionEnabled");
+static auto dehydrateQObject = dehydratorFunction(QStringList() << QStringLiteral("parent") << QStringLiteral("objectName"));
+static auto dehydrateQFObject = dehydratorFunction(QStringList() << QStringLiteral("parent") << QStringLiteral("objectName") << QStringLiteral("children"));
+static auto dehydrateQFStore = dehydratorFunction(QStringList() << QStringLiteral("parent") << QStringLiteral("objectName") << QStringLiteral("children") << QStringLiteral("bindSource") << QStringLiteral("redispatchTargets") << QStringLiteral("filterFunctionEnabled"));
 
 /// Default dehydrator function
 static QVariantMap dehydrator(QObject* source) {
@@ -116,7 +116,7 @@ void QFHydrate::rehydrate(QObject *dest, const QVariantMap &source)
 
         int index = meta->indexOfProperty(key.constData());
         if (index < 0) {
-            qWarning() << QString("Hydrate.rehydrate: %1 property is not existed").arg(iter.key());
+            qWarning() << QStringLiteral("Hydrate.rehydrate: %1 property is not existed").arg(iter.key());
             iter++;
             continue;
         }
@@ -126,7 +126,7 @@ void QFHydrate::rehydrate(QObject *dest, const QVariantMap &source)
 
         if (orig.canConvert<QObject*>()) {
             if (value.type() != QVariant::Map) {
-                qWarning() << QString("Hydrate.rehydrate: expect a QVariantMap property but it is not: %1");
+                qWarning() << QStringLiteral("Hydrate.rehydrate: expect a QVariantMap property but it is not: %1");
             } else {
                 rehydrate(orig.value<QObject*>(), value.toMap());
             }

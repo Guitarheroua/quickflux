@@ -39,7 +39,7 @@ public slots:
      */
     Q_INVOKABLE void dispatch(const QString &type, const QJSValue &message = QJSValue());
 
-    Q_INVOKABLE void waitFor(const QList<int> &ids);
+    Q_INVOKABLE void waitFor(const QVector<int> &ids);
 
     Q_INVOKABLE int addListener(const QJSValue &callback);
 
@@ -64,7 +64,7 @@ private slots:
     void send(const QString &type, const QJSValue &message);
 
 private:
-    void invokeListeners(const QList<int> &ids);
+    void invokeListeners(const QVector<int> &ids);
 
     bool m_dispatching;
 

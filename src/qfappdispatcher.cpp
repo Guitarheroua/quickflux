@@ -25,7 +25,7 @@ QFAppDispatcher::QFAppDispatcher(QObject *parent)
 
 QFAppDispatcher *QFAppDispatcher::instance(QQmlEngine *engine)
 {
-    auto dispatcher = qobject_cast<QFAppDispatcher*>(singletonObject(engine, QLatin1String{"QuickFlux"}, 1, 0, QLatin1String{"AppDispatcher"}));
+    auto dispatcher = qobject_cast<QFAppDispatcher*>(singletonObject(engine, QStringLiteral("QuickFlux"), 1, 0, QStringLiteral("AppDispatcher")));
     return dispatcher;
 }
 
@@ -49,7 +49,7 @@ QFAppDispatcher *QFAppDispatcher::instance(QQmlEngine *engine)
 
 QObject *QFAppDispatcher::singletonObject(QQmlEngine *engine, const QString &package, int versionMajor, int versionMinor, const QString &typeName)
 {
-    auto pattern = QString{"import QtQuick 2.0\nimport %1 %2.%3;QtObject { property var object : %4 }"};
+    auto pattern = QStringLiteral("import QtQuick 2.0\nimport %1 %2.%3;QtObject { property var object : %4 }");
 
     auto qml = pattern.arg(package).arg(versionMajor).arg(versionMinor).arg(typeName);
 
@@ -60,8 +60,8 @@ QObject *QFAppDispatcher::singletonObject(QQmlEngine *engine, const QString &pac
     holder = comp.create();
 
     if (!holder) {
-        qWarning() << QString("QuickFlux: Failed to gain singleton object: %1").arg(typeName);
-        qWarning() << QString("Error: ") << comp.errorString();
+        qWarning() << QStringLiteral("QuickFlux: Failed to gain singleton object: %1").arg(typeName);
+        qWarning() << QStringLiteral("Error: ") << comp.errorString();
         return nullptr;
     }
 
@@ -69,8 +69,8 @@ QObject *QFAppDispatcher::singletonObject(QQmlEngine *engine, const QString &pac
     holder->deleteLater();
 
     if (!object) {
-        qWarning() << QString("QuickFlux: Failed to gain singleton object: %1").arg(typeName);
-        qWarning() << QString("Error: Unknown");
+        qWarning() << QStringLiteral("QuickFlux: Failed to gain singleton object: %1").arg(typeName);
+        qWarning() << QStringLiteral("Error: Unknown");
     }
 
     return object;

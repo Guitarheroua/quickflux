@@ -243,18 +243,18 @@ void QFAppScript::onDispatched(const QString &type, const QJSValue &message)
     m_processing = true;
 
     // Mark for removeal
-    QList<int> marked;
+    QVector<int> marked;
 
     for (auto i = 0 ; i < m_runnables.size() ; i++) {
-        if (m_runnables[i]->type() == type) {
-            m_runnables[i]->run(message);
+        if (m_runnables.at(i)->type() == type) {
+            m_runnables.at(i)->run(message);
 
             if (!m_running) {
                 // If exit() is called in runnable. It shoud not process any more.
                 break;
             }
 
-            if (m_runnables[i]->isOnceOnly()) {
+            if (m_runnables.at(i)->isOnceOnly()) {
                 marked << i;
             }
         }
@@ -341,12 +341,12 @@ void QFAppScript::setRunning(bool running)
     emit runningChanged();
 }
 
-QList<int> QFAppScript::waitFor() const
+QVector<int> QFAppScript::waitFor() const
 {
     return m_waitFor;
 }
 
-void QFAppScript::setWaitFor(const QList<int> &waitFor)
+void QFAppScript::setWaitFor(const QVector<int> &waitFor)
 {
     m_waitFor = waitFor;
     setListenerWaitFor();

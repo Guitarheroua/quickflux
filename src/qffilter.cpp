@@ -176,6 +176,5 @@ void QFFilter::setTypes(const QStringList &types)
 
 QQmlListProperty<QObject> QFFilter::children()
 {
-    return QQmlListProperty<QObject>(qobject_cast<QObject*>(this),
-                                     m_children);
+    return QQmlListProperty<QObject>(this, m_children);
 }

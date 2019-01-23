@@ -17,7 +17,7 @@ class QFAppListener : public QQuickItem
     Q_PROPERTY(QStringList filters READ filters WRITE setFilters NOTIFY filtersChanged)
     Q_PROPERTY(bool alwaysOn READ alwaysOn WRITE setAlwaysOn NOTIFY alwaysOnChanged)
     Q_PROPERTY(int listenerId READ listenerId WRITE setListenerId NOTIFY listenerIdChanged)
-    Q_PROPERTY(QList<int> waitFor READ waitFor WRITE setWaitFor NOTIFY waitForChanged)
+    Q_PROPERTY(QVector<int> waitFor READ waitFor WRITE setWaitFor NOTIFY waitForChanged)
 
 public:
     explicit QFAppListener(QQuickItem *parent = nullptr);
@@ -56,9 +56,9 @@ public:
     int listenerId() const;
     void setListenerId(int listenerId);
 
-    QList<int> waitFor() const;
+    QVector<int> waitFor() const;
 
-    void setWaitFor(const QList<int> &waitFor);
+    void setWaitFor(const QVector<int> &waitFor);
 
 signals:
     /// It is emitted whatever it has received a dispatched message from AppDispatcher.
@@ -85,7 +85,7 @@ private:
 
     QPointer<QFDispatcher> m_target;
 
-    QMap<QString,QList<QJSValue> >  mapping;
+    QMap<QString,QVector<QJSValue>>  mapping;
 
     QString m_filter;
     QStringList m_filters;
@@ -94,7 +94,7 @@ private:
     int m_listenerId;
     QFListener* m_listener;
 
-    QList<int> m_waitFor;
+    QVector<int> m_waitFor;
 };
 
 #endif // QFAPPLISTENER_H

@@ -27,5 +27,5 @@ private slots:
 
 private:
     QJSValue m_scripts;
-    QList<QPointer<QFAppScript> > objects;
+    QVector<QPointer<QFAppScript> > objects;
 };

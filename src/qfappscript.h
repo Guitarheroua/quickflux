@@ -18,7 +18,7 @@ class QFAppScript : public QQuickItem
     Q_PROPERTY(QString runWhen READ runWhen WRITE setRunWhen NOTIFY runWhenChanged)
     Q_PROPERTY(QJSValue message READ message NOTIFY messageChanged)
     Q_PROPERTY(int listenerId READ listenerId WRITE setListenerId NOTIFY listenerIdChanged)
-    Q_PROPERTY(QList<int> waitFor READ waitFor WRITE setWaitFor NOTIFY waitForChanged)
+    Q_PROPERTY(QVector<int> waitFor READ waitFor WRITE setWaitFor NOTIFY waitForChanged)
     Q_PROPERTY(bool autoExit READ autoExit WRITE setAutoExit NOTIFY autoExitChanged)
 
 public:
@@ -38,8 +38,8 @@ public:
     int listenerId() const;
     void setListenerId(int listenerId);
 
-    QList<int> waitFor() const;
-    void setWaitFor(const QList<int> &waitFor);
+    QVector<int> waitFor() const;
+    void setWaitFor(const QVector<int> &waitFor);
 
     bool autoExit() const;
     void setAutoExit(bool autoExit);
@@ -75,7 +75,7 @@ private:
     void setListenerWaitFor();
 
     QQmlScriptString m_script;
-    QList<QFAppScriptRunnable*> m_runnables;
+    QVector<QFAppScriptRunnable*> m_runnables;
     QPointer<QFAppDispatcher> m_dispatcher;
     QString m_runWhen;
 
@@ -90,7 +90,7 @@ private:
     QJSValue m_message;
     QFListener* m_listener;
 
-    QList<int> m_waitFor;
+    QVector<int> m_waitFor;
 };
 
 #endif // QFAPPSCRIPT_H

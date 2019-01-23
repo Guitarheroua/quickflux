@@ -56,9 +56,9 @@ void QFAppScriptRunnable::release()
 {
     if (!m_condition.isNull() &&
             m_condition.isObject() &&
-        m_condition.hasProperty(QLatin1String{"disconnect"})) {
+        m_condition.hasProperty(QStringLiteral("disconnect"))) {
 
-        auto disconnect = m_condition.property(QLatin1String{"disconnect"});
+        auto disconnect = m_condition.property(QStringLiteral("disconnect"));
         QJSValueList args;
         args << m_callback;
 
@@ -73,10 +73,11 @@ void QFAppScriptRunnable::run(const QJSValue &message)
 {
     QJSValueList args;
     if (m_isSignalCondition &&
-        message.hasProperty(QLatin1String{"length"})) {
-        int count = message.property(QLatin1String{"length"}).toInt();
-        for (int i = 0 ; i < count;i++) {
-            args << message.property(i);
+        message.hasProperty(QStringLiteral("length"))) {
+        auto count = message.property(QStringLiteral("length")).toInt();
+        args.reserve(count);
+        for (auto i = 0 ; i < count; ++i) {
+            args << message.property(static_cast<quint32>(i));
         }
     } else {
         args << message;
@@ -84,11 +85,11 @@ void QFAppScriptRunnable::run(const QJSValue &message)
     QJSValue ret = m_script.call(args);
 
     if (ret.isError()) {
-        QString message = QString("%1:%2: %3: %4")
-                          .arg(ret.property(QLatin1String{"fileName"}).toString()
-                              , ret.property(QLatin1String{"lineNumber"}).toString()
-                              , ret.property(QLatin1String{"name"}).toString()
-                              , ret.property(QLatin1String{"message"}).toString());
+        QString message = QStringLiteral("%1:%2: %3: %4")
+                          .arg(ret.property(QStringLiteral("fileName")).toString()
+                             , ret.property(QStringLiteral("lineNumber")).toString()
+                             , ret.property(QStringLiteral("name")).toString()
+                             , ret.property(QStringLiteral("message")).toString());
         qWarning() << message;
     }
 
@@ -121,13 +122,13 @@ void QFAppScriptRunnable::setCondition(const QJSValue &condition)
     if (condition.isString()) {
         setType(condition.toString());
         m_isSignalCondition = false;
-    } else if (condition.isObject() && condition.hasProperty("connect")) {
+    } else if (condition.isObject() && condition.hasProperty(QStringLiteral("connect"))) {
         Q_ASSERT(!m_engine.isNull());
 
-        auto type = QString("QuickFlux.AppScript.%1").arg(QUuid::createUuid().toString());
+        auto type = QStringLiteral("QuickFlux.AppScript.%1").arg(QUuid::createUuid().toString());
         setType(type);
 
-        auto generator = "function(dispatcher) { return function() {dispatcher.dispatch(arguments)}}";
+        auto generator = QStringLiteral("function(dispatcher) { return function() {dispatcher.dispatch(arguments)}}");
         auto dispatcher = QFAppDispatcher::instance(m_engine);
         auto wrapper = new QFAppScriptDispatcherWrapper();
         wrapper->setType(type);
@@ -142,13 +143,13 @@ void QFAppScriptRunnable::setCondition(const QJSValue &condition)
         args.clear();
         args << callback;
 
-        auto connect = condition.property(QLatin1String{"connect"});
+        auto connect = condition.property(QStringLiteral("connect"));
         connect.callWithInstance(condition,args);
 
         m_callback = callback;
         m_isSignalCondition = true;
     } else {
-        qWarning() << QLatin1String{"AppScript: Invalid condition type"};
+        qWarning() << QStringLiteral("AppScript: Invalid condition type");
     }
 }
 
