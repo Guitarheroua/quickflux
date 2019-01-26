@@ -19,7 +19,6 @@ class QFStore : public QObject
 
     Q_CLASSINFO("DefaultProperty", "children")
 
-
 public:
     explicit QFStore(QObject *parent = nullptr);
     QQmlListProperty<QObject> children();

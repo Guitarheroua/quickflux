@@ -96,6 +96,7 @@ void QFMiddlewareList::setup()
     QFDispatcher* dispatcher{};
 
     creator = qobject_cast<QFActionCreator*>(m_applyTarget.data());
+
     if (creator) {
         dispatcher = creator->dispatcher();
     } else {
