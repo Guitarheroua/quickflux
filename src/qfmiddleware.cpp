@@ -63,9 +63,10 @@ Middleware {
 \endcode
 */
 
-QFMiddleware::QFMiddleware(QQuickItem* parent) : QQuickItem(parent),  m_filterFunctionEnabled(false)
+QFMiddleware::QFMiddleware(QQuickItem* parent)
+    : QQuickItem{parent}
+      , m_filterFunctionEnabled{false}
 {
-
 }
 
 /*! \qmlmethod Middleware::next(string type, object message)
@@ -96,14 +97,12 @@ void QFMiddleware::next(const QString &type, const QJSValue &message)
     auto engine = qmlEngine(this);
     QF_PRECHECK_DISPATCH(engine, type, message);
 
-    if (m_nextCallback.isCallable()) {
-        QJSValueList args;
-        args << type;
-        args << message;
-        auto result = m_nextCallback.call(args);
-        if (result.isError()) {
+    if (m_nextCallback.isCallable())
+    {
+        auto args = QJSValueList{} << type << message;
+
+        if (auto result = m_nextCallback.call(args); result.isError())
             QuickFlux::printException(result);
-        }
     }
 }
 

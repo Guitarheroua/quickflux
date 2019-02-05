@@ -8,7 +8,6 @@ QFAppListenerGroup::QFAppListenerGroup(QQuickItem* parent)
       , m_listenerId{0}
       , m_listener{}
 {
-
 }
 
 QVector<int> QFAppListenerGroup::listenerIds() const
@@ -43,21 +42,18 @@ QVector<int> QFAppListenerGroup::search(QQuickItem *item)
 {
     QVector<int> res;
 
-    auto listener = qobject_cast<QFAppListener*>(item);
-
-    if (listener) {
+    if (auto listener = qobject_cast<QFAppListener*>(item))
+    {
         res.append(listener->listenerId());
         listener->setWaitFor(QVector<int>() << m_listenerId);
     }
 
     auto childs = item->childItems();
 
-    for (const auto &child : childs) {
-        auto subRes = search(child);
-        if (!subRes.empty()) {
+    for (const auto &child : childs)
+        if (auto subRes = search(child); !subRes.empty())
             res.append(subRes);
-        }
-    }
+
     return res;
 }
 

@@ -9,11 +9,10 @@ QFMiddlewaresHook::QFMiddlewaresHook(QObject *parent) : QFHook(parent)
 
 void QFMiddlewaresHook::dispatch(const QString &type, const QJSValue &message)
 {
-    if (m_middlewares.isNull()) {
+    if (m_middlewares.isNull())
         emit dispatched(type , message);
-    } else {
+    else
         next(-1, type , message);
-    }
 }
 
 void QFMiddlewaresHook::setup(QQmlEngine *engine, QObject *middlewares)
@@ -37,16 +36,10 @@ void QFMiddlewaresHook::setup(QQmlEngine *engine, QObject *middlewares)
                                    "}");
 
     auto function = engine->evaluate(source);
+    auto args = QJSValueList{} << mobj << hobj;
 
-    QJSValueList args;
-    args << mobj;
-    args << hobj;
-
-    auto ret = function.call(args);
-
-    if (ret.isError()) {
+    if (auto ret = function.call(args); ret.isError())
         QuickFlux::printException(ret);
-    }
 
     source = QStringLiteral("function (middlewares, hook) {"
                            "  return function invoke(receiverIndex, type , message) {"
@@ -67,22 +60,16 @@ void QFMiddlewaresHook::setup(QQmlEngine *engine, QObject *middlewares)
 
     function = engine->evaluate(source);
     invoke = function.call(args);
-    if (invoke.isError()) {
+    if (invoke.isError())
         QuickFlux::printException(invoke);
-    }
 }
 
 void QFMiddlewaresHook::next(int senderIndex, const QString &type, const QJSValue &message)
 {
-    QJSValueList args;
+    auto args = QJSValueList{} << QJSValue(senderIndex + 1) << QJSValue(type) << message;
 
-    args << QJSValue(senderIndex + 1);
-    args << QJSValue(type);
-    args << message;
-    auto result = invoke.call(args);
-    if (result.isError()) {
+    if (auto result = invoke.call(args); result.isError())
         QuickFlux::printException(result);
-    }
 }
 
 void QFMiddlewaresHook::resolve(const QString &type, const QJSValue &message)

@@ -40,7 +40,6 @@ SOURCES += \
     $$PWD/priv/qfsignalproxy.cpp \
     $$PWD/qfactioncreator.cpp \
     $$PWD/qfobject.cpp \
-    $$PWD/priv/qfhook.cpp \
     $$PWD/qfdispatcher.cpp \
     $$PWD/qfappdispatcher.cpp \
     $$PWD/priv/quickfluxfunctions.cpp \

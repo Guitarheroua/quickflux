@@ -26,19 +26,15 @@ public:
 
     QObject* bindSource() const;
     void setBindSource(QObject* source);
-
     QQmlListProperty<QObject> redispatchTargets();
 
 signals:
     void dispatched(const QString &type, const QJSValue &message);
-
     void bindSourceChanged();
-
     void filterFunctionEnabledChanged();
 
 public slots:
     void dispatch(const QString &type, const QJSValue &message = QJSValue());
-
     void bind(QObject* source);
 
 
@@ -51,15 +47,10 @@ private slots:
 
 private:
     QObjectList m_children;
-
     QPointer<QObject> m_bindSource;
-
     QPointer<QFActionCreator> m_actionCreator;
-
     QPointer<QFDispatcher> m_dispatcher;
-
     QObjectList m_redispatchTargets;
-
     bool m_filterFunctionEnabled;
 
 };

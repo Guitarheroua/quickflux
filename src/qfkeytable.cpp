@@ -32,57 +32,53 @@ KeyTable {
 static QMap<int,QString> createTypes() {
     static QMap<int,QString> types
     {
-            {QVariant::String, QStringLiteral("QString")},
-            {QVariant::Int, QStringLiteral("int")},
-            {QVariant::Double, QStringLiteral("qreal")},
-            {QVariant::Bool, QStringLiteral("bool")},
-            {QVariant::PointF, QStringLiteral("QPointF")},
-            {QVariant::RectF, QStringLiteral("QRectF")},
-        };
+        {QVariant::String, QStringLiteral("QString")},
+        {QVariant::Int, QStringLiteral("int")},
+        {QVariant::Double, QStringLiteral("qreal")},
+        {QVariant::Bool, QStringLiteral("bool")},
+        {QVariant::PointF, QStringLiteral("QPointF")},
+        {QVariant::RectF, QStringLiteral("QRectF")},
+    };
 
     return types;
 }
 
-QFKeyTable::QFKeyTable(QObject *parent) : QObject(parent)
+QFKeyTable::QFKeyTable(QObject *parent)
+    : QObject{parent}
 {
-
 }
 
 QString QFKeyTable::genHeaderFile(const QString& className)
 {
-
-    QStringList header;
-    QStringList clazz;
-    auto includedPointHeader = false;
-    auto includedRectHeader = false;
-
-    header << QStringLiteral("#pragma once");
-    header << QStringLiteral("#include <QString>\n");
-
-    clazz << QStringLiteral("class %1 {\n").arg(className);
-    clazz << QStringLiteral("public:\n");
+    auto header = QStringList{} << QStringLiteral("#pragma once") << QStringLiteral("#include <QString>\n");
+    auto clazz = QStringList{} << QStringLiteral("class %1 {\n").arg(className) << QStringLiteral("public:\n");
 
     const auto meta = metaObject();
-
     auto types = createTypes();
 
-    int count = meta->propertyCount();
-    for (int i = 0 ; i < count ; i++) {
+    auto includedPointHeader = false;
+    auto includedRectHeader = false;
+    auto count = meta->propertyCount();
+
+    for (auto i = 0 ; i < count ; i++) {
         const auto p = meta->property(i);
 
         QString name(p.name());
 
-        if (name == QStringLiteral("objectName")) {
+        if (name == QStringLiteral("objectName"))
             continue;
-        }
 
-        if (types.contains(p.type())) {
+        if (types.contains(p.type()))
+        {
             clazz << QStringLiteral("    static %2 %1;\n").arg(name, types[p.type()]);
 
-            if (p.type() == QVariant::PointF && !includedPointHeader) {
+            if (p.type() == QVariant::PointF && !includedPointHeader)
+            {
                 includedPointHeader = true;
                 header << QStringLiteral("#include <QPointF>");
-            } else if (p.type() == QVariant::RectF && !includedRectHeader) {
+            }
+            else if (p.type() == QVariant::RectF && !includedRectHeader)
+            {
                 includedRectHeader = true;
                 header << QStringLiteral("#include <QRectF>");
             }
@@ -92,59 +88,55 @@ QString QFKeyTable::genHeaderFile(const QString& className)
 
     clazz << QStringLiteral("};\n");
 
-    QStringList content;
-    content << header << clazz;
+    auto content = QStringList{} << header << clazz;
 
     return content.join('\n');
 }
 
 QString QFKeyTable::genSourceFile(const QString &className, const QString &headerFile)
 {
+    auto source = QStringList{} << QStringLiteral("#include \"%1\"\n").arg(headerFile);
     auto types = createTypes();
-
-    QStringList source;
-
-    source << QStringLiteral("#include \"%1\"\n").arg(headerFile);
-
     const auto meta = metaObject();
 
-    int count = meta->propertyCount();
-    for (int i = 0 ; i < count ; i++) {
+    auto count = meta->propertyCount();
+    for (auto i = 0 ; i < count ; i++)
+    {
         const auto p = meta->property(i);
         QString name(p.name());
-        if (name == QStringLiteral("objectName")) {
+        if (name == QStringLiteral("objectName"))
             continue;
-        }
 
-        if (types.contains(p.type())) {
-            QVariant v = property(p.name());
+        if (types.contains(p.type()))
+        {
+            auto v = property(p.name());
 
-            if (p.type() == QVariant::String) {
-                source << QStringLiteral("%4 %1::%2 = \"%3\";\n")
-                              .arg(className, p.name(), v.toString(), types[p.type()]);
-
-            } else if (p.type() == QVariant::PointF) {
-                QPointF pt = v.toPointF();
-
-                source << QStringLiteral("QPointF %1::%2 = QPointF(%3,%4);\n")
-                              .arg(className, p.name(), QString::number(pt.x()), QString::number(pt.y()));
-
-            } else if (p.type() == QVariant::RectF) {
-
-                QRectF rect = v.toRectF();
-
+            switch (p.type())
+            {
+            case QVariant::String:
+                source << QStringLiteral("%4 %1::%2 = \"%3\";\n").arg(className, p.name(), v.toString(), types[p.type()]);
+                break;
+            case QVariant::PointF:
+            {
+                auto pt = v.toPointF();
+                source << QStringLiteral("QPointF %1::%2 = QPointF(%3,%4);\n").arg(className, p.name(), QString::number(pt.x()), QString::number(pt.y()));
+                break;
+            }
+            case QVariant::RectF:
+            {
+                auto rect = v.toRectF();
                 source << QStringLiteral("QRectF %1::%2 = QRect(%3,%4,%5,%6);\n")
-                          .arg(className
-                             , p.name()
-                             , QString::number(rect.x())
-                             , QString::number(rect.y())
-                             , QString::number(rect.width())
-                             , QString::number(rect.height()));
-
-            } else {
-
-                source << QStringLiteral("%4 %1::%2 = %3;\n")
-                              .arg(className, p.name(), v.toString(), types[p.type()]);
+                              .arg(className
+                                   , p.name()
+                                       , QString::number(rect.x())
+                                       , QString::number(rect.y())
+                                       , QString::number(rect.width())
+                                       , QString::number(rect.height()));
+                break;
+            }
+            default:
+                source << QStringLiteral("%4 %1::%2 = %3;\n").arg(className, p.name(), v.toString(), types[p.type()]);
+                break;
             }
         }
     }
@@ -154,26 +146,23 @@ QString QFKeyTable::genSourceFile(const QString &className, const QString &heade
 
 void QFKeyTable::classBegin()
 {
-
 }
 
 void QFKeyTable::componentComplete()
 {
     const auto meta = metaObject();
 
-    int count = meta->propertyCount();
-    for (int i = 0 ; i < count ; i++) {
+    auto count = meta->propertyCount();
+    for (auto i = 0 ; i < count ; i++)
+    {
         const auto p = meta->property(i);
         QString name(p.name());
-        if (p.type() != QVariant::String ||
-            name == QStringLiteral("objectName")) {
-            continue;
-        }
 
-        auto v = property(p.name());
-        if (!v.isNull()) {
+        if (p.type() != QVariant::String || name == QStringLiteral("objectName"))
             continue;
-        }
+
+        if (auto v = property(p.name()); !v.isNull())
+            continue;
 
         setProperty(p.name(), name);
     }

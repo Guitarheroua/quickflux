@@ -57,9 +57,9 @@ for above problem.
  */
 
 
-QFFilter::QFFilter(QObject *parent) : QObject(parent)
+QFFilter::QFFilter(QObject *parent)
+    : QObject{parent}
 {
-
 }
 
 /*! \qmlproperty string Filter::type
@@ -98,7 +98,6 @@ void QFFilter::setType(const QString &type)
 
 void QFFilter::classBegin()
 {
-
 }
 
 void QFFilter::componentComplete()
@@ -106,29 +105,33 @@ void QFFilter::componentComplete()
     auto object = parent();
     m_engine = qmlEngine(this);
 
-    if (!object) {
+    if (!object)
+    {
         qDebug() << QStringLiteral("Filter - Disabled due to missing parent.");
         return;
     }
 
     const auto meta = object->metaObject();
 
-    if (meta->indexOfSignal("dispatched(QString,QJSValue)") >= 0) {
-        connect(object,SIGNAL(dispatched(QString,QJSValue)),
-                this,SLOT(filter(QString,QJSValue)));
-    } else if (meta->indexOfSignal("dispatched(QString,QVariant)") >= 0) {
-        connect(object,SIGNAL(dispatched(QString,QVariant)),
-                this,SLOT(filter(QString,QVariant)));
-    } else {
+    if (meta->indexOfSignal("dispatched(QString,QJSValue)") >= 0)
+    {
+        connect(object, SIGNAL(dispatched(QString,QJSValue)), this, SLOT(filter(QString,QJSValue)));
+    }
+    else if (meta->indexOfSignal("dispatched(QString,QVariant)") >= 0)
+    {
+        connect(object, SIGNAL(dispatched(QString,QVariant)), this, SLOT(filter(QString,QVariant)));
+    }
+    else
+    {
         qDebug() << QStringLiteral("Filter - Disabled due to missing dispatched signal in parent object.");
         return;
     }
-
 }
 
 void QFFilter::filter(const QString &type, const QJSValue &message)
 {
-    if (m_types.indexOf(type) >= 0) {
+    if (m_types.indexOf(type) >= 0)
+    {
         QF_PRECHECK_DISPATCH(m_engine.data(), type, message);
         emit dispatched(type, message);
     }
@@ -136,7 +139,8 @@ void QFFilter::filter(const QString &type, const QJSValue &message)
 
 void QFFilter::filter(const QString &type, const QVariant &message)
 {
-    if (m_types.indexOf(type) >= 0) {
+    if (m_types.indexOf(type) >= 0)
+    {
         auto value = message.value<QJSValue>();
         QF_PRECHECK_DISPATCH(m_engine.data(), type, value);
 

@@ -13,7 +13,7 @@
 
 
 QFAppDispatcher::QFAppDispatcher(QObject *parent)
-    : QFDispatcher(parent)
+    : QFDispatcher{parent}
 {
 }
 
@@ -50,16 +50,13 @@ QFAppDispatcher *QFAppDispatcher::instance(QQmlEngine *engine)
 QObject *QFAppDispatcher::singletonObject(QQmlEngine *engine, const QString &package, int versionMajor, int versionMinor, const QString &typeName)
 {
     auto pattern = QStringLiteral("import QtQuick 2.0\nimport %1 %2.%3;QtObject { property var object : %4 }");
-
     auto qml = pattern.arg(package).arg(versionMajor).arg(versionMinor).arg(typeName);
+    auto comp = QQmlComponent{engine};
+    comp.setData(qml.toUtf8(), QUrl());
+    auto holder = comp.create();
 
-    QObject* holder{};
-
-    auto comp = QQmlComponent(engine);
-    comp.setData(qml.toUtf8(),QUrl());
-    holder = comp.create();
-
-    if (!holder) {
+    if (!holder)
+    {
         qWarning() << QStringLiteral("QuickFlux: Failed to gain singleton object: %1").arg(typeName);
         qWarning() << QStringLiteral("Error: ") << comp.errorString();
         return nullptr;
@@ -68,7 +65,8 @@ QObject *QFAppDispatcher::singletonObject(QQmlEngine *engine, const QString &pac
     auto object = holder->property("object").value<QObject*>();
     holder->deleteLater();
 
-    if (!object) {
+    if (!object)
+    {
         qWarning() << QStringLiteral("QuickFlux: Failed to gain singleton object: %1").arg(typeName);
         qWarning() << QStringLiteral("Error: Unknown");
     }

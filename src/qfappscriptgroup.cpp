@@ -45,9 +45,9 @@ Item {
 
  */
 
-QFAppScriptGroup::QFAppScriptGroup(QQuickItem* parent) : QQuickItem(parent)
+QFAppScriptGroup::QFAppScriptGroup(QQuickItem* parent)
+    : QQuickItem{parent}
 {
-
 }
 
 /*! \qmlproperty array AppScriptGroup::scripts
@@ -78,39 +78,41 @@ QJSValue QFAppScriptGroup::scripts() const
 
 void QFAppScriptGroup::setScripts(const QJSValue &scripts)
 {
-    for (const auto &object : objects) {
-        if (object.data()) {
+    for (const auto &object : objects)
+        if (object.data())
             object->disconnect(this);
-        }
-    }
 
     objects.clear();
     m_scripts = scripts;
 
-    if (!scripts.isArray()) {
+    if (!scripts.isArray())
+    {
         qWarning() << QStringLiteral("AppScriptGroup: Invalid scripts property");
         return;
     }
 
     auto count = scripts.property(QStringLiteral("length")).toInt();
 
-    for (auto i = 0 ; i < count ; i++) {
+    for (auto i = 0 ; i < count ; i++)
+    {
         auto item = scripts.property(static_cast<quint32>(i));
 
-        if (!item.isQObject()) {
+        if (!item.isQObject())
+        {
             qWarning() << QStringLiteral("AppScriptGroup: Invalid scripts property");
             continue;
         }
 
         auto object = qobject_cast<QFAppScript*>(item.toQObject());
 
-        if (!object) {
+        if (!object)
+        {
             qWarning() << QStringLiteral("AppScriptGroup: Invalid scripts property");
             continue;
         }
+
         objects << object;
-        connect(object, &QFAppScript::started,
-                this, &QFAppScriptGroup::onStarted);
+        connect(object, &QFAppScript::started, this, &QFAppScriptGroup::onStarted);
     }
 
     emit scriptsChanged();
@@ -124,24 +126,22 @@ void QFAppScriptGroup::setScripts(const QJSValue &scripts)
 
 void QFAppScriptGroup::exitAll()
 {
-    for (const auto &object : objects) {
-        if (object.data()) {
+    for (const auto &object : objects)
+        if (object.data())
             object->exit();
-        }
-    }
 }
 
 void QFAppScriptGroup::onStarted()
 {
     auto source = qobject_cast<QFAppScript*>(sender());
 
-    for (const auto &object : objects) {
+    for (const auto &object : objects)
+    {
         if (object.isNull())
             continue;
 
-        if (object.data() != source) {
+        if (object.data() != source)
             object->exit();
-        }
     }
 }
 

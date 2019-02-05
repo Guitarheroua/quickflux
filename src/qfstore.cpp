@@ -118,9 +118,10 @@ The default value is false
  */
 
 
-QFStore::QFStore(QObject *parent) : QObject(parent) , m_filterFunctionEnabled(false)
+QFStore::QFStore(QObject *parent)
+    : QObject{parent}
+    , m_filterFunctionEnabled{false}
 {
-
 }
 
 QQmlListProperty<QObject> QFStore::children()
@@ -133,40 +134,30 @@ void QFStore::dispatch(const QString &type, const QJSValue &message)
     auto engine = qmlEngine(this);
     QF_PRECHECK_DISPATCH(engine, type, message);
 
-    for(const auto &child : m_children) {
-        auto store = qobject_cast<QFStore*>(child);
-        if (!store) {
-            continue;
-        }
-        store->dispatch(type, message);
-    }
+    for(const auto &child : m_children)
+        if (auto store = qobject_cast<QFStore *>(child))
+            store->dispatch(type, message);
 
-    for(const auto &child : m_redispatchTargets) {
-        auto store = qobject_cast<QFStore*>(child);
+    for(const auto &child : m_redispatchTargets)
+        if ( auto store = qobject_cast<QFStore*>(child))
+            store->dispatch(type, message);
 
-        if (!store) {
-            continue;
-        }
-        store->dispatch(type, message);
-    }
-
-    if (m_filterFunctionEnabled) {
+    if (m_filterFunctionEnabled)
+    {
         const auto meta = metaObject();
-        QByteArray signature;
-        int index;
 
-        signature = QMetaObject::normalizedSignature(QStringLiteral("%1(QVariant)").arg(type).toUtf8().constData());
-        if ( (index = meta->indexOfMethod(signature.constData())) >= 0 ) {
+        auto signature = QMetaObject::normalizedSignature(QStringLiteral("%1(QVariant)").arg(type).toUtf8().constData());
+        if (auto index = meta->indexOfMethod(signature.constData()); index >= 0)
+        {
             auto method = meta->method(index);
             auto value = QVariant::fromValue<QJSValue>(message);
-
-            method.invoke(this,Qt::DirectConnection, Q_ARG(QVariant, value));
+            method.invoke(this, Qt::DirectConnection, Q_ARG(QVariant, value));
         }
 
         signature = QMetaObject::normalizedSignature(QStringLiteral("%1()").arg(type).toUtf8().constData());
-        if ( (index = meta->indexOfMethod(signature.constData())) >= 0 ) {
+        if (auto index = meta->indexOfMethod(signature.constData()); index >= 0)
+        {
             auto method = meta->method(index);
-
             method.invoke(this);
         }
     }
@@ -181,46 +172,30 @@ void QFStore::bind(QObject *source)
 
 void QFStore::setup()
 {
-    QFActionCreator *creator{};
-    QFDispatcher* dispatcher{};
+    const auto bindSourceData = m_bindSource.data();
 
-    creator = qobject_cast<QFActionCreator*>(m_bindSource.data());
+    auto creator = qobject_cast<QFActionCreator*>(bindSourceData);
+    auto dispatcher = creator ? creator->dispatcher()
+                              : qobject_cast<QFDispatcher *>(bindSourceData);
 
-    if (creator) {
-        dispatcher = creator->dispatcher();
-    } else {
-        dispatcher = qobject_cast<QFDispatcher*>(m_bindSource.data());
-    }
-
-    if (m_actionCreator.data() == creator &&
-        m_dispatcher.data() == dispatcher) {
         // Nothing changed.
+    if (m_actionCreator.data() == creator && m_dispatcher.data() == dispatcher)
         return;
-    }
 
-    if (!m_actionCreator.isNull() &&
-        m_actionCreator.data() != creator) {
+    if (!m_actionCreator.isNull() && m_actionCreator.data() != creator)
         m_actionCreator->disconnect(this);
-    }
 
-    if (!m_dispatcher.isNull() &&
-        m_dispatcher.data() != dispatcher) {
+    if (!m_dispatcher.isNull() && m_dispatcher.data() != dispatcher)
         m_dispatcher->disconnect(this);
-    }
 
     m_actionCreator = creator;
     m_dispatcher = dispatcher;
 
-    if (!m_actionCreator.isNull()) {
-        connect(m_actionCreator.data(), &QFActionCreator::dispatcherChanged,
-                this, &QFStore::setup);
-    }
+    if (!m_actionCreator.isNull())
+        connect(m_actionCreator.data(), &QFActionCreator::dispatcherChanged, this, &QFStore::setup);
 
-    if (!m_dispatcher.isNull()) {
-        connect(dispatcher, &QFDispatcher::dispatched,
-                this, &QFStore::dispatch);
-    }
-
+    if (!m_dispatcher.isNull())
+        connect(dispatcher, &QFDispatcher::dispatched, this, &QFStore::dispatch);
 }
 
 /*! \qmlproperty array Store::redispatchTargets

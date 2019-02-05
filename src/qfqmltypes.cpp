@@ -27,7 +27,8 @@ static QObject *appDispatcherProvider(QQmlEngine *engine, QJSEngine *scriptEngin
     return object;
 }
 
-static QObject* hydrateProvider(QQmlEngine *engine, QJSEngine *scriptEngine) {
+static QObject* hydrateProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
     Q_UNUSED(engine);
     Q_UNUSED(scriptEngine);
 
@@ -39,9 +40,8 @@ static QObject* hydrateProvider(QQmlEngine *engine, QJSEngine *scriptEngine) {
 void registerQuickFluxQmlTypes()
 {
     static bool registered = false;
-    if (registered) {
+    if (registered)
         return;
-    }
 
     registered = true;
 

@@ -54,15 +54,12 @@ void QFAppScriptRunnable::setEngine(QQmlEngine* engine)
 
 void QFAppScriptRunnable::release()
 {
-    if (!m_condition.isNull() &&
-            m_condition.isObject() &&
-        m_condition.hasProperty(QStringLiteral("disconnect"))) {
-
+    if (!m_condition.isNull() && m_condition.isObject() && m_condition.hasProperty(QStringLiteral("disconnect")))
+    {
         auto disconnect = m_condition.property(QStringLiteral("disconnect"));
-        QJSValueList args;
-        args << m_callback;
+        auto args = QJSValueList{} << m_callback;
 
-        disconnect.callWithInstance(m_condition,args);
+        disconnect.callWithInstance(m_condition, args);
     }
 
     m_condition = QJSValue();
@@ -72,19 +69,20 @@ void QFAppScriptRunnable::release()
 void QFAppScriptRunnable::run(const QJSValue &message)
 {
     QJSValueList args;
-    if (m_isSignalCondition &&
-        message.hasProperty(QStringLiteral("length"))) {
+    if (m_isSignalCondition && message.hasProperty(QStringLiteral("length")))
+    {
         auto count = message.property(QStringLiteral("length")).toInt();
         args.reserve(count);
-        for (auto i = 0 ; i < count; ++i) {
+        for (auto i = 0 ; i < count; ++i)
             args << message.property(static_cast<quint32>(i));
-        }
-    } else {
+    }
+    else
+    {
         args << message;
     }
-    QJSValue ret = m_script.call(args);
 
-    if (ret.isError()) {
+
+    if (auto ret = m_script.call(args); ret.isError()) {
         QString message = QStringLiteral("%1:%2: %3: %4")
                           .arg(ret.property(QStringLiteral("fileName")).toString()
                              , ret.property(QStringLiteral("lineNumber")).toString()
@@ -119,10 +117,13 @@ void QFAppScriptRunnable::setCondition(const QJSValue &condition)
 {
     m_condition = condition;
 
-    if (condition.isString()) {
+    if (condition.isString())
+    {
         setType(condition.toString());
         m_isSignalCondition = false;
-    } else if (condition.isObject() && condition.hasProperty(QStringLiteral("connect"))) {
+    }
+    else if (condition.isObject() && condition.hasProperty(QStringLiteral("connect")))
+    {
         Q_ASSERT(!m_engine.isNull());
 
         auto type = QStringLiteral("QuickFlux.AppScript.%1").arg(QUuid::createUuid().toString());
@@ -136,19 +137,20 @@ void QFAppScriptRunnable::setCondition(const QJSValue &condition)
 
         auto generatorFunc = m_engine->evaluate(generator);
 
-        QJSValueList args;
-        args << m_engine->newQObject(wrapper);
+        auto args = QJSValueList{} << m_engine->newQObject(wrapper);
         auto callback = generatorFunc.call(args);
 
         args.clear();
         args << callback;
 
         auto connect = condition.property(QStringLiteral("connect"));
-        connect.callWithInstance(condition,args);
+        connect.callWithInstance(condition, args);
 
         m_callback = callback;
         m_isSignalCondition = true;
-    } else {
+    }
+    else
+    {
         qWarning() << QStringLiteral("AppScript: Invalid condition type");
     }
 }

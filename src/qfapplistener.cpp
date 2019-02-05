@@ -92,9 +92,8 @@ QFAppListener::QFAppListener(QQuickItem *parent)
 
 QFAppListener::~QFAppListener()
 {
-    if (!m_target.isNull()) {
+    if (!m_target.isNull())
         m_target->removeListener(m_listenerId);
-    }
 }
 
 QObject *QFAppListener::target() const
@@ -104,7 +103,8 @@ QObject *QFAppListener::target() const
 
 void QFAppListener::setTarget(QFDispatcher *target)
 {
-    if (!m_target.isNull()) {
+    if (!m_target.isNull())
+    {
         m_target->removeListener(m_listenerId);
         m_listener->disconnect(this);
         m_listener->deleteLater();
@@ -114,16 +114,15 @@ void QFAppListener::setTarget(QFDispatcher *target)
 
     m_target = target;
 
-    if (!m_target.isNull()) {
-
+    if (!m_target.isNull())
+    {
         m_listener = new QFListener(this);
 
         setListenerId(m_target->addListener(m_listener));
 
         setListenerWaitFor();
 
-        connect(m_listener, &QFListener::dispatched,
-                this, &QFAppListener::onMessageReceived);
+        connect(m_listener, &QFListener::dispatched, this, &QFAppListener::onMessageReceived);
     }
 }
 
@@ -138,9 +137,8 @@ QFAppListener *QFAppListener::on(const QString &type, const QJSValue &callback)
 {
     QVector<QJSValue> list;
 
-    if (mapping.contains(type)) {
+    if (mapping.contains(type))
         list = mapping.value(type);
-    }
 
     list.append(callback);
 
@@ -156,22 +154,24 @@ QFAppListener *QFAppListener::on(const QString &type, const QJSValue &callback)
 
 void QFAppListener::removeListener(const QString &type, const QJSValue &callback)
 {
-    if (!mapping.contains(type)) {
+    if (!mapping.contains(type))
         return;
-    };
 
     QVector<QJSValue> list;
     list = mapping[type];
 
-    int index = -1;
-    for (int i = 0 ; i < list.size() ;i++) {
-        if (list.at(i).equals(callback)) {
+    auto index = -1;
+    for (auto i = 0 ; i < list.size() ;i++)
+    {
+        if (list.at(i).equals(callback))
+        {
             index = i;
             break;
         }
     }
 
-    if (index >=0 ) {
+    if (index >=0 )
+    {
         list.removeAt(index);
         mapping[type] = list;
     }
@@ -183,11 +183,10 @@ void QFAppListener::removeListener(const QString &type, const QJSValue &callback
 
 void QFAppListener::removeAllListener(const QString &type)
 {
-    if (type.isEmpty()) {
+    if (type.isEmpty())
         mapping.clear();
-    } else {
+    else
         mapping.remove(type);
-    }
 }
 
 void QFAppListener::componentComplete()
@@ -197,12 +196,10 @@ void QFAppListener::componentComplete()
     auto engine = qmlEngine(this);
     Q_ASSERT(engine);
 
-    auto dispatcher = QFAppDispatcher::instance(engine);
-    if (!dispatcher) {
+    if (auto dispatcher = QFAppDispatcher::instance(engine); !dispatcher)
         qWarning() << "Unknown error: Unable to access AppDispatcher";
-    } else {
+    else
         setTarget(dispatcher);
-    }
 }
 
 void QFAppListener::onMessageReceived(const QString &type, const QJSValue &message)
@@ -213,27 +210,26 @@ void QFAppListener::onMessageReceived(const QString &type, const QJSValue &messa
     auto dispatch = true;
 
     auto rules = m_filters;
-    if (!m_filter.isEmpty()) {
+    if (!m_filter.isEmpty())
         rules.append(m_filter);
-    }
 
-    if (!rules.empty()) {
+    if (!rules.empty())
+    {
         dispatch = false;
-
-        for (const auto &rule : rules) {
-            if (type == rule) {
+        for (const auto &rule : rules)
+        {
+            if (type == rule)
+            {
                 dispatch = true;
                 break;
             }
         }
     }
 
-    if (dispatch) {
+    if (dispatch)
         emit dispatched(type,message);
-    }
 
     // Listener registered with on() should not be affected by filter.
-
     if (!mapping.contains(type))
         return;
 
@@ -242,19 +238,15 @@ void QFAppListener::onMessageReceived(const QString &type, const QJSValue &messa
     QVector<QJSValue> arguments;
     arguments << message;
 
-    for(auto &value : list)  {
-        if (value.isCallable()) {
+    for(auto &value : list)
+        if (value.isCallable())
             value.call(arguments.toList());
-        }
-    }
-
 }
 
 void QFAppListener::setListenerWaitFor()
 {
-    if (!m_listener) {
+    if (!m_listener)
         return;
-    }
 
     m_listener->setWaitFor(m_waitFor);
 }

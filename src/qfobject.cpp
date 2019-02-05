@@ -1,8 +1,8 @@
 #include "qfobject.h"
 
-QFObject::QFObject(QObject *parent) : QObject(parent)
+QFObject::QFObject(QObject *parent)
+    : QObject{parent}
 {
-
 }
 
 QQmlListProperty<QObject> QFObject::children()

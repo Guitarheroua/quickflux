@@ -2,9 +2,9 @@
 #include <QMetaObject>
 #include "qfsignalproxy.h"
 
-QFSignalProxy::QFSignalProxy(QObject *parent) : QObject(parent)
+QFSignalProxy::QFSignalProxy(QObject *parent)
+    : QObject{parent}
 {
-
 }
 
 void QFSignalProxy::bind(QObject *source, int signalIdx, QQmlEngine* engine, QFDispatcher* dispatcher)
@@ -19,38 +19,33 @@ void QFSignalProxy::bind(QObject *source, int signalIdx, QQmlEngine* engine, QFD
     m_engine = engine;
     m_dispatcher = dispatcher;
 
-    for (int i = 0 ; i < method.parameterCount() ; i++) {
+    for (int i = 0 ; i < method.parameterCount() ; i++)
+    {
         parameterTypes[i] = method.parameterType(i);
         parameterNames[i] = QString(method.parameterNames().at(i));
     }
 
-    if (!QMetaObject::connect(source, signalIdx, this, memberOffset, Qt::AutoConnection, nullptr)) {
+    if (!QMetaObject::connect(source, signalIdx, this, memberOffset, Qt::AutoConnection, nullptr))
         qWarning() << QStringLiteral("Failed to bind signal");
-    }
 }
 
 int QFSignalProxy::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    int methodId = QObject::qt_metacall(_c, _id, _a);
+    auto methodId = QObject::qt_metacall(_c, _id, _a);
 
-    if (methodId < 0) {
+    if (methodId < 0)
         return methodId;
-    }
 
-    if (_c == QMetaObject::InvokeMetaMethod) {
-
+    if (_c == QMetaObject::InvokeMetaMethod)
+    {
         if (methodId == 0) {
             QVariantMap message;
 
-            for (int i = 0 ; i < parameterTypes.count() ; i++) {
+            for (int i = 0 ; i < parameterTypes.count() ; i++)
+            {
                 const auto type = static_cast<QMetaType::Type>(parameterTypes.at(i));
-                QVariant v;
-
-                if (type == QMetaType::QVariant) {
-                    v = *reinterpret_cast<QVariant *>(_a[i + 1]);
-                } else {
-                    v = QVariant(type, _a[i + 1]);
-                }
+                auto v = (type == QMetaType::QVariant) ? *reinterpret_cast<QVariant *>(_a[i + 1])
+                                                       : QVariant(type, _a[i + 1]);
 
                 message[parameterNames.at(i)] = v;
             }
@@ -65,14 +60,14 @@ int QFSignalProxy::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 
 void QFSignalProxy::dispatch(const QVariantMap &message)
 {
-    if (m_engine.isNull() || m_dispatcher.isNull()) {
+    if (m_engine.isNull() || m_dispatcher.isNull())
         return;
-    }
 
     auto value = m_engine->newObject();
 
     QMapIterator<QString, QVariant> iter(message);
-    while (iter.hasNext()) {
+    while (iter.hasNext())
+    {
         iter.next();
         auto v = m_engine->toScriptValue<QVariant>(iter.value());
         value.setProperty(iter.key(), v);

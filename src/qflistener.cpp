@@ -4,7 +4,7 @@
 
 QFListener::QFListener(QObject *parent)
     : QObject(parent)
-      , m_listenerId{0}
+    , m_listenerId{0}
 {
 }
 
@@ -21,21 +21,19 @@ void QFListener::setCallback(const QJSValue &callback)
 void QFListener::dispatch(QFDispatcher *dispatcher, const QString &type, const QJSValue &message)
 {
 
-    if (!m_waitFor.empty()) {
+    if (!m_waitFor.empty())
         dispatcher->waitFor(m_waitFor);
-    }
 
-    if (m_callback.isCallable()) {
-        QJSValueList args;
-        args << type << message;
-        auto ret = m_callback.call(args);
-
-        if (ret.isError()) {
+    if (m_callback.isCallable())
+    {
+        auto args = QJSValueList{} << type << message;
+        if (auto ret = m_callback.call(args); ret.isError())
+        {
             auto message = QStringLiteral("%1:%2: %3: %4")
                                .arg(ret.property(QStringLiteral("fileName")).toString()
-                                        , ret.property(QStringLiteral("lineNumber")).toString()
-                                        , ret.property(QStringLiteral("name")).toString()
-                                        , ret.property(QStringLiteral("message")).toString());
+                                  , ret.property(QStringLiteral("lineNumber")).toString()
+                                  , ret.property(QStringLiteral("name")).toString()
+                                  , ret.property(QStringLiteral("message")).toString());
             qWarning() << message;
         }
     }

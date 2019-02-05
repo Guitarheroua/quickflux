@@ -126,7 +126,8 @@ void QFAppScript::exit(int returnCode)
 
 void QFAppScript::run(const QJSValue &message)
 {
-    if (m_processing) {
+    if (m_processing)
+    {
         qWarning() << "AppScript::run(): Don't call run() within script / wait callback";
         return;
     }
@@ -135,7 +136,8 @@ void QFAppScript::run(const QJSValue &message)
     clear();
     setMessage(message);
 
-    if (m_dispatcher.isNull()) {
+    if (m_dispatcher.isNull())
+    {
         qWarning() << "AppScript::run() - Missing AppDispatcher. Aborted.";
         m_processing = false;
         return;
@@ -147,17 +149,14 @@ void QFAppScript::run(const QJSValue &message)
 
     auto expr = QQmlExpression(m_script);
 
-    if (!m_script.isEmpty()) {
+    if (!m_script.isEmpty())
         expr.evaluate();
-    }
 
-    if (expr.hasError()) {
+    if (expr.hasError())
         qWarning() << expr.error();
-    }
 
-    if (m_runnables.empty()) {
+    if (m_runnables.empty())
         exit(0);
-    }
 
     m_processing = false;
 }

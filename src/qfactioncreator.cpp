@@ -46,57 +46,47 @@ QFActionCreator::QFActionCreator(QObject *parent)
 
 QString QFActionCreator::genKeyTable()
 {
-    QStringList imports, header, footer, properties;
-
-    imports << QStringLiteral("pragma Singleton")
-            << QStringLiteral("import QtQuick 2.0")
-            << QStringLiteral("import QuickFlux 1.0\n");
-
-    header << QStringLiteral("KeyTable {\n");
-
-    footer <<  QStringLiteral("}");
+    auto imports = QStringList{} << QStringLiteral("pragma Singleton")
+                                 << QStringLiteral("import QtQuick 2.0")
+                                 << QStringLiteral("import QuickFlux 1.0\n");
+    auto header = QStringList{} << QStringLiteral("KeyTable {\n");
+    auto footer = QStringList{} <<  QStringLiteral("}");
 
     const auto memberOffset = QObject::staticMetaObject.methodCount();
-
     const auto meta = metaObject();
-
     auto count = meta->methodCount();
+    QStringList properties;
 
-    for (auto i = memberOffset ; i < count ;i++) {
+    for (auto i = memberOffset ; i < count ;i++)
+    {
         auto method = meta->method(i);
-        if (method.name() == QByteArrayLiteral("dispatcherChanged")) {
+        if (method.name() == QByteArrayLiteral("dispatcherChanged"))
             continue;
-        }
-        if (method.methodType() == QMetaMethod::Signal) {
+        if (method.methodType() == QMetaMethod::Signal)
             properties << QStringLiteral("    property string %1;\n").arg(QString(method.name()));
-        }
     }
 
-    QStringList content;
-    content << imports << header << properties << footer;
+    auto content = QStringList{} << imports << header << properties << footer;
 
     return content.join('\n');
 }
 
 void QFActionCreator::dispatch(const QString &type, const QJSValue &message)
 {
-    if (!m_dispatcher.isNull()) {
+    if (!m_dispatcher.isNull())
         m_dispatcher->dispatch(type, message);
-    }
 }
 
 void QFActionCreator::classBegin()
 {
-
 }
 
 void QFActionCreator::componentComplete()
 {
     auto engine = qmlEngine(this);
 
-    if (m_dispatcher.isNull()) {
+    if (m_dispatcher.isNull())
         setDispatcher(QFAppDispatcher::instance(engine));
-    }
 
     auto dispatcher = m_dispatcher.data();
 
@@ -106,13 +96,14 @@ void QFActionCreator::componentComplete()
 
     auto count = meta->methodCount();
 
-    for (int i = memberOffset ; i < count ;i++) {
+    for (int i = memberOffset ; i < count ;i++)
+    {
         QMetaMethod method = meta->method(i);
-        if (method.name() == QByteArray{"dispatcherChanged"}) {
+        if (method.name() == QByteArray{"dispatcherChanged"})
             continue;
-        }
 
-        if (method.methodType() == QMetaMethod::Signal) {
+        if (method.methodType() == QMetaMethod::Signal)
+        {
             auto proxy = new QFSignalProxy(this);
             proxy->bind(this, i, engine, dispatcher);
             m_proxyList << proxy;
@@ -145,9 +136,8 @@ QFDispatcher *QFActionCreator::dispatcher() const
 void QFActionCreator::setDispatcher(QFDispatcher *value)
 {
     m_dispatcher = value;
-    for (auto &proxy : m_proxyList) {
+    for (auto &proxy : m_proxyList)
         proxy->setDispatcher(m_dispatcher);
-    }
 
     emit dispatcherChanged();
 }

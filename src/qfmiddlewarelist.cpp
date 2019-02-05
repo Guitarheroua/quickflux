@@ -53,9 +53,10 @@ It is added since QuickFlux 1.1
  *
  */
 
-QFMiddlewareList::QFMiddlewareList(QQuickItem* parent) : QQuickItem(parent)
+QFMiddlewareList::QFMiddlewareList(QQuickItem* parent)
+    : QQuickItem{parent}
+    , m_engine{}
 {
-    m_engine = nullptr;
 }
 
 void QFMiddlewareList::apply(QObject *source)
@@ -65,46 +66,31 @@ void QFMiddlewareList::apply(QObject *source)
 
 void QFMiddlewareList::next(int senderIndex, const QString &type, const QJSValue &message)
 {
-    QJSValueList args;
+    auto args = QJSValueList{} << QJSValue{senderIndex + 1} << QJSValue{type} << message;
 
-    args << QJSValue(senderIndex + 1);
-    args << QJSValue(type);
-    args << message;
-    auto result = invoke.call(args);
-    if (result.isError()) {
+    if (auto result = invoke.call(args); result.isError())
         QuickFlux::printException(result);
-    }
 }
 
 void QFMiddlewareList::classBegin()
 {
-
 }
 
 void QFMiddlewareList::componentComplete()
 {
     m_engine = qmlEngine(this);
 
-    if (!m_applyTarget.isNull()) {
+    if (!m_applyTarget.isNull())
         setup();
-    }
 }
 
 void QFMiddlewareList::setup()
 {
-    QFActionCreator *creator{};
-    QFDispatcher* dispatcher{};
+    auto creator = qobject_cast<QFActionCreator*>(m_applyTarget.data());
+    auto dispatcher = creator ? creator->dispatcher() : qobject_cast<QFDispatcher*>(m_applyTarget.data());
 
-    creator = qobject_cast<QFActionCreator*>(m_applyTarget.data());
-    if (creator) {
-        dispatcher = creator->dispatcher();
-    } else {
-        dispatcher = qobject_cast<QFDispatcher*>(m_applyTarget.data());
-    }
-
-    if (creator == nullptr && dispatcher == nullptr) {
+    if (!creator && !dispatcher)
         qWarning() << QStringLiteral("Middlewares.apply(): Invalid input");
-    }
 
     if (m_actionCreator.data() == creator &&
         m_dispatcher.data() == dispatcher) {
@@ -112,14 +98,12 @@ void QFMiddlewareList::setup()
         return;
     }
 
-    if (!m_actionCreator.isNull() &&
-        m_actionCreator.data() != creator) {
-        // in case the action creator is not changed, do nothing.
+    // in case the action creator is not changed, do nothing.
+    if (!m_actionCreator.isNull() && m_actionCreator.data() != creator)
         m_actionCreator->disconnect(this);
-    }
 
-    if (!m_dispatcher.isNull() &&
-        m_dispatcher.data() != dispatcher) {
+    if (!m_dispatcher.isNull() && m_dispatcher.data() != dispatcher)
+    {
         auto hook = m_dispatcher->hook();
         m_dispatcher->setHook(nullptr);
         m_dispatcher->disconnect(this);
@@ -129,19 +113,17 @@ void QFMiddlewareList::setup()
     m_actionCreator = creator;
     m_dispatcher = dispatcher;
 
-    if (!m_actionCreator.isNull()) {
-        connect(m_actionCreator.data(), &QFActionCreator::dispatcherChanged,
-                this, &QFMiddlewareList::setup);
-    }
+    if (!m_actionCreator.isNull())
+        connect(m_actionCreator.data(), &QFActionCreator::dispatcherChanged, this, &QFMiddlewareList::setup);
 
-    if (!m_dispatcher.isNull()) {
+    if (!m_dispatcher.isNull())
+    {
         auto hook = new QFMiddlewaresHook();
         hook->setParent(this);
         hook->setup(m_engine.data(), this);
 
-        if (!m_dispatcher.isNull()) {
+        if (!m_dispatcher.isNull())
             m_dispatcher->setHook(hook);
-        }
     }
 }
 
@@ -153,10 +135,9 @@ QObject *QFMiddlewareList::applyTarget() const
 void QFMiddlewareList::setApplyTarget(QObject *applyTarget)
 {
     m_applyTarget = applyTarget;
-    if (!m_engine.isNull()) {
+
+    if (!m_engine.isNull())
         setup();
-    }
 
     emit applyTargetChanged();
 }
-

@@ -12,8 +12,6 @@ class QFMiddlewaresHook : public QFHook
 public:
     explicit QFMiddlewaresHook(QObject *parent = nullptr);
 
-signals:
-
 public:
     void dispatch(const QString &type, const QJSValue &message) override;
     void setup(QQmlEngine* engine, QObject* middlewares);

@@ -9,7 +9,7 @@ class QFAppScriptDispatcherWrapper : public QObject
 {
     Q_OBJECT
 public:
-    QFAppScriptDispatcherWrapper() = default;
+    using QObject::QObject;
 
     QString type() const;
     void setType(const QString &type);

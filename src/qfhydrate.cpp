@@ -7,32 +7,33 @@
 
 static QVariantMap dehydrator(QObject* source);
 
-static auto dehydratorFunction = [](const QStringList& ignoreList) -> std::function<QVariantMap (QObject *)> {
-
-    return [=](QObject* source) {
+static auto dehydratorFunction = [](const QStringList& ignoreList) -> std::function<QVariantMap (QObject *)>
+{
+    return [ignoreList](QObject* source) {
         QVariantMap dest;
-        const QMetaObject* meta = source->metaObject();
+        const auto meta = source->metaObject();
+        for (auto i = 0 ; i < meta->propertyCount(); i++)
+        {
+            const auto property = meta->property(i);
+            const auto name = property.name();
+            auto stringName = QString{name};
 
-        for (int i = 0 ; i < meta->propertyCount(); i++) {
-            const QMetaProperty property = meta->property(i);
-            const char* name = property.name();
-            QString stringName = name;
-
-            if (ignoreList.indexOf(stringName) >= 0) {
+            if (ignoreList.indexOf(stringName) >= 0)
                 continue;
-            }
 
-            QVariant value = source->property(name);
+            auto value = source->property(name);
 
-            if (value.canConvert<QObject*>()) {
-                auto object = value.value<QObject*>();
-                if (!object) {
+            if (value.canConvert<QObject *>())
+            {
+                auto object = value.value<QObject *>();
+                if (!object)
                     continue;
-                }
+
                 value = dehydrator(object);
             }
             dest[stringName] = value;
         }
+
         return dest;
     };
 };
@@ -43,15 +44,13 @@ static auto dehydrateQFStore = dehydratorFunction(QStringList() << QStringLitera
 
 /// Default dehydrator function
 static QVariantMap dehydrator(QObject* source) {
-    QVariantMap ret;
     if (qobject_cast<QFStore*>(source)) {
-        ret = dehydrateQFStore(source);
+        return dehydrateQFStore(source);
     } else if (qobject_cast<QFObject*>(source)) {
-        ret = dehydrateQFObject(source);
+        return dehydrateQFObject(source);
     } else {
-        ret = dehydrateQObject(source);
+        return dehydrateQObject(source);
     }
-    return ret;
 }
 
 /*!
@@ -84,9 +83,9 @@ It is added since Quick Flux 1.1
 
 */
 
-QFHydrate::QFHydrate(QObject *parent) : QObject(parent)
+QFHydrate::QFHydrate(QObject *parent)
+    : QObject{parent}
 {
-
 }
 
 /*!
@@ -114,8 +113,8 @@ void QFHydrate::rehydrate(QObject *dest, const QVariantMap &source)
     while (iter != source.end()) {
         auto key = iter.key().toLocal8Bit();
 
-        int index = meta->indexOfProperty(key.constData());
-        if (index < 0) {
+        if (auto index = meta->indexOfProperty(key.constData()); index < 0)
+        {
             qWarning() << QStringLiteral("Hydrate.rehydrate: %1 property is not existed").arg(iter.key());
             iter++;
             continue;
@@ -124,14 +123,16 @@ void QFHydrate::rehydrate(QObject *dest, const QVariantMap &source)
         auto orig = dest->property(key.constData());
         auto value = source[iter.key()];
 
-        if (orig.canConvert<QObject*>()) {
-            if (value.type() != QVariant::Map) {
+        if (orig.canConvert<QObject*>())
+        {
+            if (value.type() != QVariant::Map)
                 qWarning() << QStringLiteral("Hydrate.rehydrate: expect a QVariantMap property but it is not: %1");
-            } else {
+            else
                 rehydrate(orig.value<QObject*>(), value.toMap());
-            }
 
-        } else if (orig != value) {
+        }
+        else if (orig != value)
+        {
             dest->setProperty(key.constData(), value);
         }
 

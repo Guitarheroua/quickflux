@@ -38,25 +38,16 @@ public slots:
       listeners
      */
     Q_INVOKABLE void dispatch(const QString &type, const QJSValue &message = QJSValue());
-
     Q_INVOKABLE void waitFor(const QVector<int> &ids);
-
     Q_INVOKABLE int addListener(const QJSValue &callback);
-
     Q_INVOKABLE void removeListener(int id);
 
 public:
-
     void dispatch(const QString& type, const QVariant& message);
-
     int addListener(QFListener* listener);
-
     QQmlEngine *engine() const;
-
     void setEngine(QQmlEngine *engine);
-
     QFHook *hook() const;
-
     void setHook(QFHook *hook);
 
 private slots:
@@ -74,25 +65,25 @@ private:
     QQueue<QPair<QString,QJSValue > > m_queue;
 
     // Next id for listener.
-    int nextListenerId;
+    int m_nextListenerId;
 
     // Registered listener
     QMap<int, QPointer<QFListener> > m_listeners;
 
     // Current dispatching listener id
-    int dispatchingListenerId;
+    int m_dispatchingListenerId;
 
     // Current dispatching message
-    QJSValue dispatchingMessage;
+    QJSValue m_dispatchingMessage;
 
     // Current dispatching message type
-    QString dispatchingMessageType;
+    QString m_dispatchingMessageType;
 
     // List of listeners pending to be invoked.
-    QMap<int,bool> pendingListeners;
+    QMap<int,bool> m_pendingListeners;
 
     // List of listeners blocked in waitFor()
-    QMap<int,bool> waitingListeners;
+    QMap<int,bool> m_waitingListeners;
 
     QPointer<QFHook> m_hook;
 };
