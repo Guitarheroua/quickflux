@@ -64,7 +64,7 @@ Store {
 
   Filter {
     type: ActionTypes.openItem
-    onDispatcher: {
+    onDispatched: {
       // ..
     }
   }
